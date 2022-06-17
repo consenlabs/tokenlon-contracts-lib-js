@@ -12,9 +12,22 @@ module.exports = {
             chainId: 1,
             accounts,
             forking: {
-                url: process.env.MAINNET_NODE_RPC_URL,
+                url: process.env.FORK_NODE_RPC_URL,
             },
             allowUnlimitedContractSize: true,
         },
+    },
+    solidity: {
+        compilers: [
+            {
+                version: "0.7.6",
+                settings: {
+                    optimizer: {
+                        enabled: true,
+                        runs: 1000,
+                    },
+                },
+            },
+        ],
     },
 }
