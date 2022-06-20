@@ -4,3 +4,4 @@ cache
 dist
 node_modules
 playground
+typechain-types

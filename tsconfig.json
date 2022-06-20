@@ -2,7 +2,10 @@
   "extends": "@tsconfig/recommended/tsconfig.json",
   "compilerOptions": {
     "baseUrl": ".",
-    "paths": {}
+    "paths": {
+      "@typechain": ["./typechain-types"]
+    }
   },
-  "include": ["hardhat.config.ts", "src/**/*", "test/**/*"]
+  "include": ["typechain-types", "src", "test"],
+  "files": ["hardhat.config.ts"]
 }

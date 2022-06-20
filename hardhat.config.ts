@@ -1,5 +1,6 @@
 import "dotenv/config"
 import "tsconfig-paths/register"
+import "@typechain/hardhat"
 import "@nomiclabs/hardhat-ethers"
 
 const accounts = {
