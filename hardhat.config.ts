@@ -14,6 +14,7 @@ module.exports = {
             accounts,
             forking: {
                 url: process.env.FORK_NODE_RPC_URL,
+                blockNumber: parseInt(process.env.FORK_BLOCK_NUMBER!, 10),
             },
             allowUnlimitedContractSize: true,
         },
