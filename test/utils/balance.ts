@@ -11,14 +11,15 @@ export async function dealETH(target: Addressable, amount: BigNumberish) {
     })
 }
 
-export async function dealToken(target: Addressable, tokenAddr: string, amount: BigNumberish) {
-    const slot = await probeBalanceStorageSlot(tokenAddr)
+export async function dealToken(target: Addressable, token: Addressable, amount: BigNumberish) {
+    const slot = await probeBalanceStorageSlot(await getAddress(token))
     const index = getStorageMapIndex(await getAddress(target), slot)
-    await setStorageNumber(tokenAddr, index, amount)
+    await setStorageNumber(await getAddress(token), index, amount)
 }
 
-async function probeBalanceStorageSlot(tokenAddr: string) {
-    const token = await ethers.getContractAt("IERC20", tokenAddr)
+async function probeBalanceStorageSlot(token: Addressable): Promise<number> {
+    const tokenAddr = await getAddress(token)
+    const tokenContract = await ethers.getContractAt("IERC20", tokenAddr)
     const account = ethers.constants.AddressZero
     for (let i = 0; i <= 100; i++) {
         const index = getStorageMapIndex(account, i)
@@ -35,7 +36,7 @@ async function probeBalanceStorageSlot(tokenAddr: string) {
         // Probe to check if this storage is related to balance
         const p = b.add(1)
         await setStorageNumber(tokenAddr, index, p)
-        const pb: BigNumber = await token.balanceOf(account)
+        const pb = await tokenContract.balanceOf(account)
         await setStorageNumber(tokenAddr, index, b)
 
         if (pb.eq(p)) {

@@ -1,70 +1,73 @@
 import { expect } from "chai"
 import { ContractReceipt } from "ethers"
+import { ethers } from "hardhat"
 
+import network from "@network"
 import { UniswapV3Fee } from "@src/encoder/utils/uniswap"
 import { EncoderV5 } from "@src/encoder/v5"
 import { AMMOrder, SignerV5, SignatureType } from "@src/signer/v5"
-import { withContext } from "@test/utils/context"
+import { dealToken } from "@test/utils/balance"
+import { contextSuite } from "@test/utils/context"
 import { EXPIRY } from "@test/utils/constant"
 import { parseLogsByName } from "@test/utils/contract"
 
-describe(
-    "AMMWrapperWithPath",
-    withContext((ctx) => {
-        const encoder = new EncoderV5()
-        const signer = new SignerV5()
+contextSuite("AMMWrapperWithPath", ({ wallet, token, tokenlon, uniswap }) => {
+    const encoder = new EncoderV5()
+    const signer = new SignerV5()
+    const defaultOrder: AMMOrder = {
+        makerAddr: uniswap.UniswapV3Router.address,
+        takerAssetAddr: token.WETH.address,
+        makerAssetAddr: token.DAI.address,
+        takerAssetAmount: 10,
+        makerAssetAmount: 0,
+        userAddr: wallet.user.address,
+        receiverAddr: wallet.user.address,
+        salt: signer.randomSalt(),
+        deadline: EXPIRY,
+    }
 
-        let order: AMMOrder
+    before(async () => {
+        await token.WETH.connect(wallet.user).approve(
+            network.AllowanceTarget,
+            ethers.constants.MaxUint256,
+        )
+        await dealToken(wallet.user, token.WETH, defaultOrder.takerAssetAmount)
+    })
 
-        before(async () => {
-            order = {
-                makerAddr: ctx.uniswap.UniswapV3Router.address,
-                takerAssetAddr: ctx.token.WETH.address,
-                makerAssetAddr: ctx.token.DAI.address,
-                takerAssetAmount: 10,
-                makerAssetAmount: 0,
-                userAddr: ctx.wallet.user.address,
-                receiverAddr: ctx.wallet.user.address,
-                salt: signer.randomSalt(),
-                deadline: EXPIRY,
-            }
-            order.makerAssetAmount =
-                await ctx.uniswap.UniswapV3Quoter.callStatic.quoteExactInputSingle(
-                    order.takerAssetAddr,
-                    order.makerAssetAddr,
-                    UniswapV3Fee.LOW,
-                    order.takerAssetAmount,
-                    0,
-                )
-        })
-
-        it("Should sign valid AMM UniswapV3 single hop order", async () => {
-            const { signature } = await signer.connect(ctx.wallet.user).signAMMOrder(order, {
-                type: SignatureType.EIP712,
-                verifyingContract: ctx.tokenlon.AMMWrapperWithPath.address,
-            })
-            const payload = encoder.encodeAMMTradeWithPath({
-                ...order,
-                feeFactor: 0,
-                signature,
-                makerSpecificData: encoder.encodeAMMUniswapV3SingleHop(UniswapV3Fee.LOW),
-                path: [ctx.token.WETH.address, ctx.token.DAI.address],
-            })
-            const tx = await ctx.tokenlon.Tokenlon.connect(ctx.wallet.user).toAMM(payload)
-            const receipt = await tx.wait()
-
-            assertSwappedByUniswapV3(receipt)
-        })
-
-        function assertSwappedByUniswapV3(receipt: ContractReceipt) {
-            assertSwapped(receipt, "Uniswap V3")
+    it("Should sign valid AMM UniswapV3 single hop order", async () => {
+        const order = {
+            ...defaultOrder,
+            makerAssetAmount: await uniswap.UniswapV3Quoter.callStatic.quoteExactInputSingle(
+                defaultOrder.takerAssetAddr,
+                defaultOrder.makerAssetAddr,
+                UniswapV3Fee.LOW,
+                defaultOrder.takerAssetAmount,
+                0,
+            ),
         }
+        const { signature } = await signer.connect(wallet.user).signAMMOrder(order, {
+            type: SignatureType.EIP712,
+            verifyingContract: tokenlon.AMMWrapperWithPath.address,
+        })
+        const payload = encoder.encodeAMMTradeWithPath({
+            ...order,
+            feeFactor: 0,
+            signature,
+            makerSpecificData: encoder.encodeAMMUniswapV3SingleHop(UniswapV3Fee.LOW),
+            path: [token.WETH.address, token.DAI.address],
+        })
+        const tx = await tokenlon.Tokenlon.connect(wallet.user).toAMM(payload)
+        const receipt = await tx.wait()
 
-        function assertSwapped(receipt: ContractReceipt, source: string) {
-            const {
-                args: [meta],
-            } = parseLogsByName(ctx.tokenlon.AMMWrapperWithPath, "Swapped", receipt.logs)[0]
-            expect(meta.source).to.equal(source)
-        }
-    }),
-)
+        assertSwappedByUniswapV3(receipt)
+    })
+
+    function assertSwappedByUniswapV3(receipt: ContractReceipt) {
+        assertSwapped(receipt, "Uniswap V3")
+    }
+
+    function assertSwapped(receipt: ContractReceipt, source: string) {
+        const { args } = parseLogsByName(tokenlon.AMMWrapperWithPath, "Swapped", receipt.logs)[0]
+        expect(args[0].source).to.equal(source)
+    }
+})
