@@ -5,12 +5,12 @@ import network from "@network"
 import {
     IAMMWrapperWithPath,
     IERC20,
-    ITokenlon,
     IUniswapV3Quoter,
     IUniswapV3Router,
+    IUserProxy,
 } from "@typechain"
 
-import { dealETH, dealToken } from "./balance"
+import { dealETH } from "./balance"
 import { toBytes32 } from "./bytes"
 import { Snapshot } from "./snapshot"
 
@@ -24,7 +24,7 @@ export type Context = {
     }
     tokenlon: {
         AMMWrapperWithPath: IAMMWrapperWithPath
-        Tokenlon: ITokenlon
+        UserProxy: IUserProxy
     }
     uniswap: {
         UniswapV3Quoter: IUniswapV3Quoter
@@ -47,7 +47,7 @@ const __ctx__ = new Promise<Context>(async (resolve) =>
                 "IAMMWrapperWithPath",
                 network.AMMWrapperWithPath,
             ),
-            Tokenlon: await ethers.getContractAt("ITokenlon", network.Tokenlon),
+            UserProxy: await ethers.getContractAt("IUserProxy", network.UserProxy),
         },
         uniswap: {
             UniswapV3Quoter: await ethers.getContractAt(

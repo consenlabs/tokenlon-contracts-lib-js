@@ -14,6 +14,7 @@ import { parseLogsByName } from "@test/utils/contract"
 contextSuite("AMMWrapperWithPath", ({ wallet, token, tokenlon, uniswap }) => {
     const encoder = new EncoderV5()
     const signer = new SignerV5()
+
     const defaultOrder: AMMOrder = {
         makerAddr: uniswap.UniswapV3Router.address,
         takerAssetAddr: token.WETH.address,
@@ -37,26 +38,27 @@ contextSuite("AMMWrapperWithPath", ({ wallet, token, tokenlon, uniswap }) => {
     it("Should sign valid AMM UniswapV3 single hop order", async () => {
         const order = {
             ...defaultOrder,
-            makerAssetAmount: await uniswap.UniswapV3Quoter.callStatic.quoteExactInputSingle(
-                defaultOrder.takerAssetAddr,
-                defaultOrder.makerAssetAddr,
-                UniswapV3Fee.LOW,
-                defaultOrder.takerAssetAmount,
-                0,
-            ),
         }
+        order.makerAssetAmount = await uniswap.UniswapV3Quoter.callStatic.quoteExactInputSingle(
+            order.takerAssetAddr,
+            order.makerAssetAddr,
+            UniswapV3Fee.LOW,
+            order.takerAssetAmount,
+            0,
+        )
         const { signature } = await signer.connect(wallet.user).signAMMOrder(order, {
             type: SignatureType.EIP712,
             verifyingContract: tokenlon.AMMWrapperWithPath.address,
         })
+        const makerSpecificData = encoder.encodeAMMUniswapV3SingleHop(UniswapV3Fee.LOW)
         const payload = encoder.encodeAMMTradeWithPath({
             ...order,
             feeFactor: 0,
             signature,
-            makerSpecificData: encoder.encodeAMMUniswapV3SingleHop(UniswapV3Fee.LOW),
-            path: [token.WETH.address, token.DAI.address],
+            makerSpecificData,
+            path: [order.takerAssetAddr, order.makerAssetAddr],
         })
-        const tx = await tokenlon.Tokenlon.connect(wallet.user).toAMM(payload)
+        const tx = await tokenlon.UserProxy.connect(wallet.user).toAMM(payload)
         const receipt = await tx.wait()
 
         assertSwappedByUniswapV3(receipt)

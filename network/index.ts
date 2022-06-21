@@ -6,9 +6,9 @@ export default require(`./${network}.ts`).default as {
     DAI: string
 
     // Tokenlon
-    Tokenlon: string
     AllowanceTarget: string
     AMMWrapperWithPath: string
+    UserProxy: string
 
     // Uniswap
     UniswapV3Quoter: string
