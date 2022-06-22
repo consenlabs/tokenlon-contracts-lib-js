@@ -28,12 +28,12 @@ export class Encoder {
         ])
     }
 
-    public encodeAMMUniswapV3SingleHop(fee: UniswapV3Fee): string {
+    public encodeAMMUniswapV3SingleHopData(fee: UniswapV3Fee): string {
         const swapType = 1
         return ethers.utils.defaultAbiCoder.encode(["uint8", "uint24"], [swapType, fee])
     }
 
-    public encodeAMMUniswapV3MultiHops(path: string[], fees: UniswapV3Fee[]): string {
+    public encodeAMMUniswapV3MultiHopsData(path: string[], fees: UniswapV3Fee[]): string {
         const swapType = 2
         const uniswapV3Path = encodeUniswapV3Path(path, fees)
         return ethers.utils.defaultAbiCoder.encode(["uint8", "bytes"], [swapType, uniswapV3Path])

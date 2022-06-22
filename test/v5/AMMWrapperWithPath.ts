@@ -4,7 +4,7 @@ import { ethers } from "hardhat"
 
 import { AMMOrder, encoder, signer } from "@src/v5"
 import { SignatureType } from "@src/signer"
-import { UniswapV3Fee } from "@src/uniswap"
+import { UniswapV3Fee, encodeUniswapV3Path } from "@src/uniswap"
 
 import { dealToken } from "@test/utils/balance"
 import { EXPIRY } from "@test/utils/constant"
@@ -16,7 +16,7 @@ contextSuite("AMMWrapperWithPath", ({ wallet, token, tokenlon, uniswap }) => {
         makerAddr: uniswap.UniswapV3Router.address,
         takerAssetAddr: token.WETH.address,
         makerAssetAddr: token.DAI.address,
-        takerAssetAmount: 10,
+        takerAssetAmount: 100,
         makerAssetAmount: 0,
         userAddr: wallet.user.address,
         receiverAddr: wallet.user.address,
@@ -32,7 +32,7 @@ contextSuite("AMMWrapperWithPath", ({ wallet, token, tokenlon, uniswap }) => {
         await dealToken(wallet.user, token.WETH, defaultOrder.takerAssetAmount)
     })
 
-    it("Should sign valid AMM UniswapV3 single hop order", async () => {
+    it("Should sign and encode valid AMM UniswapV3 single hop order", async () => {
         const order = {
             ...defaultOrder,
         }
@@ -47,13 +47,41 @@ contextSuite("AMMWrapperWithPath", ({ wallet, token, tokenlon, uniswap }) => {
             type: SignatureType.EIP712,
             verifyingContract: tokenlon.AMMWrapperWithPath.address,
         })
-        const makerSpecificData = encoder.encodeAMMUniswapV3SingleHop(UniswapV3Fee.LOW)
+        const makerSpecificData = encoder.encodeAMMUniswapV3SingleHopData(UniswapV3Fee.LOW)
         const payload = encoder.encodeAMMTradeWithPath({
             ...order,
             feeFactor: 0,
             signature,
             makerSpecificData,
             path: [order.takerAssetAddr, order.makerAssetAddr],
+        })
+        const tx = await tokenlon.UserProxy.connect(wallet.user).toAMM(payload)
+        const receipt = await tx.wait()
+
+        assertSwappedByUniswapV3(receipt, order)
+    })
+
+    it("Should sign and encode valid AMM UniswapV3 multi hops order", async () => {
+        const order = {
+            ...defaultOrder,
+        }
+        const path = [order.takerAssetAddr, order.makerAssetAddr]
+        const fees = [UniswapV3Fee.LOW]
+        order.makerAssetAmount = await uniswap.UniswapV3Quoter.callStatic.quoteExactInput(
+            encodeUniswapV3Path(path, fees),
+            order.takerAssetAmount,
+        )
+        const { signature } = await signer.connect(wallet.user).signAMMOrder(order, {
+            type: SignatureType.EIP712,
+            verifyingContract: tokenlon.AMMWrapperWithPath.address,
+        })
+        const makerSpecificData = encoder.encodeAMMUniswapV3MultiHopsData(path, fees)
+        const payload = encoder.encodeAMMTradeWithPath({
+            ...order,
+            feeFactor: 0,
+            signature,
+            makerSpecificData,
+            path,
         })
         const tx = await tokenlon.UserProxy.connect(wallet.user).toAMM(payload)
         const receipt = await tx.wait()
