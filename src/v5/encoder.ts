@@ -38,4 +38,8 @@ export class Encoder {
         const uniswapV3Path = encodeUniswapV3Path(path, fees)
         return ethers.utils.defaultAbiCoder.encode(["uint8", "bytes"], [swapType, uniswapV3Path])
     }
+
+    public encodeAMMCurveData(version: number): string {
+        return ethers.utils.defaultAbiCoder.encode(["uint8"], [version])
+    }
 }

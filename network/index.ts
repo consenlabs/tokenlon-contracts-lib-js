@@ -16,6 +16,9 @@ export type Network = {
     UniswapV2Router: string
     UniswapV3Quoter: string
     UniswapV3Router: string
+
+    // Curve
+    Curve3Pool: string
 }
 
 export default require(`./${network}.ts`).default as Network

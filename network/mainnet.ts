@@ -14,4 +14,7 @@ export default {
     UniswapV2Router: "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D",
     UniswapV3Quoter: "0xb27308f9F90D607463bb33eA1BeBb41C27CE5AB6",
     UniswapV3Router: "0xE592427A0AEce92De3Edee1F18E0157C05861564",
+
+    // Curve
+    Curve3Pool: "0xbEbc44782C7dB0a1A60Cb6fe97d0b483032FF1C7",
 }

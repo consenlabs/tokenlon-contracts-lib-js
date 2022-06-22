@@ -11,7 +11,7 @@ import { EXPIRY } from "@test/utils/constant"
 import { contextSuite } from "@test/utils/context"
 import { parseLogsByName } from "@test/utils/contract"
 
-contextSuite("AMMWrapperWithPath", ({ wallet, token, tokenlon, uniswap }) => {
+contextSuite("AMMWrapperWithPath", ({ wallet, token, tokenlon, uniswap, network }) => {
     const defaultOrder: AMMOrder = {
         makerAddr: "0x",
         takerAssetAddr: token.WETH.address,
@@ -27,12 +27,12 @@ contextSuite("AMMWrapperWithPath", ({ wallet, token, tokenlon, uniswap }) => {
     before(async () => {
         await token.WETH.connect(wallet.user).approve(
             tokenlon.AllowanceTarget.address,
-            ethers.constants.MaxUint256,
+            defaultOrder.takerAssetAmount,
         )
         await dealToken(wallet.user, token.WETH, defaultOrder.takerAssetAmount)
     })
 
-    it("Should sign and encode valid UniswapV2 order with path", async () => {
+    it("Should sign and encode valid Uniswap v2 order", async () => {
         const order = {
             ...defaultOrder,
             makerAddr: uniswap.UniswapV2Router.address,
@@ -59,7 +59,7 @@ contextSuite("AMMWrapperWithPath", ({ wallet, token, tokenlon, uniswap }) => {
         assertSwappedByUniswapV2(receipt, order)
     })
 
-    it("Should sign and encode valid UniswapV3 single hop order", async () => {
+    it("Should sign and encode valid Uniswap v3 single hop order", async () => {
         const order = {
             ...defaultOrder,
             makerAddr: uniswap.UniswapV3Router.address,
@@ -89,7 +89,7 @@ contextSuite("AMMWrapperWithPath", ({ wallet, token, tokenlon, uniswap }) => {
         assertSwappedByUniswapV3(receipt, order)
     })
 
-    it("Should sign and encode valid UniswapV3 multi hops order", async () => {
+    it("Should sign and encode valid Uniswap v3 multi hops order", async () => {
         const order = {
             ...defaultOrder,
             makerAddr: uniswap.UniswapV3Router.address,
@@ -118,12 +118,52 @@ contextSuite("AMMWrapperWithPath", ({ wallet, token, tokenlon, uniswap }) => {
         assertSwappedByUniswapV3(receipt, order)
     })
 
+    it("Should sign and encode valid Curve v1 order", async () => {
+        const curve3pool = await ethers.getContractAt("ICurve", network.Curve3Pool)
+        const order = {
+            ...defaultOrder,
+            makerAddr: curve3pool.address,
+            takerAssetAddr: token.USDC.address,
+            takerAssetAmount: 100,
+            makerAssetAddr: token.USDT.address,
+        }
+        // In 3 pool, USDC has index of 1, and USDT has index of 2.
+        order.makerAssetAmount = await curve3pool.callStatic.get_dy(1, 2, order.takerAssetAmount)
+
+        await token.USDC.connect(wallet.user).approve(
+            tokenlon.AllowanceTarget.address,
+            order.takerAssetAmount,
+        )
+        await dealToken(wallet.user, token.USDC, order.takerAssetAmount)
+
+        const { signature } = await signer.connect(wallet.user).signAMMOrder(order, {
+            type: SignatureType.EIP712,
+            verifyingContract: tokenlon.AMMWrapperWithPath.address,
+        })
+        const makerSpecificData = encoder.encodeAMMCurveData(1)
+        const payload = encoder.encodeAMMTradeWithPath({
+            ...order,
+            feeFactor: 0,
+            signature,
+            makerSpecificData,
+            path: [order.takerAssetAddr, order.makerAssetAddr],
+        })
+        const tx = await tokenlon.UserProxy.connect(wallet.user).toAMM(payload)
+        const receipt = await tx.wait()
+
+        assertSwappedByCurve(receipt, order)
+    })
+
     function assertSwappedByUniswapV2(receipt: ContractReceipt, order: AMMOrder) {
         assertSwapped(receipt, "Uniswap V2", order)
     }
 
     function assertSwappedByUniswapV3(receipt: ContractReceipt, order: AMMOrder) {
         assertSwapped(receipt, "Uniswap V3", order)
+    }
+
+    function assertSwappedByCurve(receipt: ContractReceipt, order: AMMOrder) {
+        assertSwapped(receipt, "Curve", order)
     }
 
     function assertSwapped(receipt: ContractReceipt, source: string, order: AMMOrder) {
