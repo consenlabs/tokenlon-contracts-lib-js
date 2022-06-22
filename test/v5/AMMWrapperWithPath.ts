@@ -3,18 +3,16 @@ import { ContractReceipt } from "ethers"
 import { ethers } from "hardhat"
 
 import network from "@network"
-import { UniswapV3Fee } from "@src/encoder/utils/uniswap"
-import { EncoderV5 } from "@src/encoder/v5"
-import { AMMOrder, SignerV5, SignatureType } from "@src/signer/v5"
+import { AMMOrder, encoder, signer } from "@src/v5"
+import { SignatureType } from "@src/signer"
+import { UniswapV3Fee } from "@src/uniswap"
+
 import { dealToken } from "@test/utils/balance"
-import { contextSuite } from "@test/utils/context"
 import { EXPIRY } from "@test/utils/constant"
+import { contextSuite } from "@test/utils/context"
 import { parseLogsByName } from "@test/utils/contract"
 
 contextSuite("AMMWrapperWithPath", ({ wallet, token, tokenlon, uniswap }) => {
-    const encoder = new EncoderV5()
-    const signer = new SignerV5()
-
     const defaultOrder: AMMOrder = {
         makerAddr: uniswap.UniswapV3Router.address,
         takerAssetAddr: token.WETH.address,

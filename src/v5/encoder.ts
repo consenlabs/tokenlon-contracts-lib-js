@@ -1,25 +1,10 @@
 import { BigNumberish, ethers } from "ethers"
 
-import { UniswapV3Fee, encodeUniswapV3Path } from "../utils/uniswap"
+import { UniswapV3Fee, encodeUniswapV3Path } from "../uniswap"
 import { abiAMMWrapperWithPath } from "./abi"
+import { AMMTradeWithPathData } from "./types"
 
-export type AMMTradeWithPathData = {
-    makerAddr: string
-    takerAssetAddr: string
-    makerAssetAddr: string
-    takerAssetAmount: BigNumberish
-    makerAssetAmount: BigNumberish
-    userAddr: string
-    receiverAddr: string
-    salt: BigNumberish
-    deadline: number
-    feeFactor: number
-    signature: string
-    makerSpecificData: string
-    path: string[]
-}
-
-export class EncoderV5 {
+export class Encoder {
     /* AMM */
 
     public encodeAMMTradeWithPath(data: AMMTradeWithPathData): string {

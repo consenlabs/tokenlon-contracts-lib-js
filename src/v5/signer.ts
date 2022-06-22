@@ -1,22 +1,7 @@
-import { BigNumberish } from "ethers"
-import { EIP712Signer } from "../eip712"
-import { Signer, SigningOptions, SigningResult } from "../signer"
+import { Signer as BaseSigner, SigningOptions, SigningResult } from "../signer"
+import { AMMOrder } from "./types"
 
-export * from "../signer"
-
-export type AMMOrder = {
-    makerAddr: string
-    takerAssetAddr: string
-    makerAssetAddr: string
-    takerAssetAmount: BigNumberish
-    makerAssetAmount: BigNumberish
-    userAddr: string
-    receiverAddr: string
-    salt: BigNumberish
-    deadline: number
-}
-
-export class SignerV5 extends Signer {
+export class Signer extends BaseSigner {
     public constructor() {
         super({
             name: "Tokenlon",
