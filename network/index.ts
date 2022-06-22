@@ -3,6 +3,8 @@ const network = process.env.NETWORK
 export type Network = {
     // Token
     DAI: string
+    USDC: string
+    USDT: string
     WETH: string
 
     // Tokenlon

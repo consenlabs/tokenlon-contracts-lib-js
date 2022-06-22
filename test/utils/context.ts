@@ -1,7 +1,7 @@
 import { Wallet } from "ethers"
 import { ethers } from "hardhat"
 
-import network from "@network"
+import network, { Network } from "@network"
 import {
     IAllowanceTarget,
     IAMMWrapperWithPath,
@@ -22,6 +22,8 @@ export type Context = {
     }
     token: {
         DAI: IERC20
+        USDC: IERC20
+        USDT: IERC20
         WETH: IERC20
     }
     tokenlon: {
@@ -34,6 +36,7 @@ export type Context = {
         UniswapV3Quoter: IUniswapV3Quoter
         UniswapV3Router: IUniswapV3Router
     }
+    network: Network
     snapshot: Snapshot
 }
 
@@ -44,6 +47,8 @@ const __ctx__ = new Promise<Context>(async (resolve) =>
         },
         token: {
             DAI: await ethers.getContractAt("IERC20", network.DAI),
+            USDC: await ethers.getContractAt("IERC20", network.USDC),
+            USDT: await ethers.getContractAt("IERC20", network.USDT),
             WETH: await ethers.getContractAt("IERC20", network.WETH),
         },
         tokenlon: {
@@ -71,6 +76,7 @@ const __ctx__ = new Promise<Context>(async (resolve) =>
                 network.UniswapV3Router,
             ),
         },
+        network,
         snapshot: await Snapshot.take(),
     }),
 )
