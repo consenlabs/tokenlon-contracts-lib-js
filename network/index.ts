@@ -1,9 +1,9 @@
 const network = process.env.NETWORK
 
-export default require(`./${network}.ts`).default as {
+export type Network = {
     // Token
-    WETH: string
     DAI: string
+    WETH: string
 
     // Tokenlon
     AllowanceTarget: string
@@ -11,6 +11,9 @@ export default require(`./${network}.ts`).default as {
     UserProxy: string
 
     // Uniswap
+    UniswapV2Router: string
     UniswapV3Quoter: string
     UniswapV3Router: string
 }
+
+export default require(`./${network}.ts`).default as Network

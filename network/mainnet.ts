@@ -1,7 +1,7 @@
 export default {
     // Token
-    WETH: "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
     DAI: "0x6B175474E89094C44Da98b954EedeAC495271d0F",
+    WETH: "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
 
     // Tokenlon
     AllowanceTarget: "0x8A42d311D282Bfcaa5133b2DE0a8bCDBECea3073",
@@ -9,6 +9,7 @@ export default {
     UserProxy: "0x03f34bE1BF910116595dB1b11E9d1B2cA5D59659",
 
     // Uniswap
+    UniswapV2Router: "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D",
     UniswapV3Quoter: "0xb27308f9F90D607463bb33eA1BeBb41C27CE5AB6",
     UniswapV3Router: "0xE592427A0AEce92De3Edee1F18E0157C05861564",
 }

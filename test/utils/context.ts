@@ -6,6 +6,7 @@ import {
     IAllowanceTarget,
     IAMMWrapperWithPath,
     IERC20,
+    IUniswapV2Router,
     IUniswapV3Quoter,
     IUniswapV3Router,
     IUserProxy,
@@ -20,8 +21,8 @@ export type Context = {
         user: Wallet
     }
     token: {
-        WETH: IERC20
         DAI: IERC20
+        WETH: IERC20
     }
     tokenlon: {
         AllowanceTarget: IAllowanceTarget
@@ -29,6 +30,7 @@ export type Context = {
         UserProxy: IUserProxy
     }
     uniswap: {
+        UniswapV2Router: IUniswapV2Router
         UniswapV3Quoter: IUniswapV3Quoter
         UniswapV3Router: IUniswapV3Router
     }
@@ -41,8 +43,8 @@ const __ctx__ = new Promise<Context>(async (resolve) =>
             user: new Wallet(toBytes32(1), ethers.provider),
         },
         token: {
-            WETH: await ethers.getContractAt("IERC20", network.WETH),
             DAI: await ethers.getContractAt("IERC20", network.DAI),
+            WETH: await ethers.getContractAt("IERC20", network.WETH),
         },
         tokenlon: {
             AllowanceTarget: await ethers.getContractAt(
@@ -56,6 +58,10 @@ const __ctx__ = new Promise<Context>(async (resolve) =>
             UserProxy: await ethers.getContractAt("IUserProxy", network.UserProxy),
         },
         uniswap: {
+            UniswapV2Router: await ethers.getContractAt(
+                "IUniswapV2Router",
+                network.UniswapV2Router,
+            ),
             UniswapV3Quoter: await ethers.getContractAt(
                 "IUniswapV3Quoter",
                 network.UniswapV3Quoter,
