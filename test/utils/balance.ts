@@ -1,7 +1,7 @@
 import { BigNumber, BigNumberish } from "ethers"
 import { ethers } from "hardhat"
 import { Addressable, getAddress } from "./address"
-import { toBytes32 } from "./bytes"
+import { BytesConvertible, toBytes32 } from "./bytes"
 
 export async function dealETH(target: Addressable, amount: BigNumberish) {
     const [operator] = await ethers.getSigners()
@@ -14,55 +14,50 @@ export async function dealETH(target: Addressable, amount: BigNumberish) {
 export async function dealToken(target: Addressable, token: Addressable, amount: BigNumberish) {
     const slot = await probeBalanceStorageSlot(await getAddress(token))
     const index = getStorageMapIndex(await getAddress(target), slot)
-    await setStorageNumber(await getAddress(token), index, amount)
+    await setStorageAt(await getAddress(token), index, BigNumber.from(amount))
 }
 
 async function probeBalanceStorageSlot(token: Addressable): Promise<number> {
-    const tokenAddr = await getAddress(token)
-    const tokenContract = await ethers.getContractAt("IERC20", tokenAddr)
     const account = ethers.constants.AddressZero
+    const tokenAddress = await getAddress(token)
+    const tokenContract = await ethers.getContractAt("IERC20", tokenAddress)
     for (let i = 0; i <= 100; i++) {
         const index = getStorageMapIndex(account, i)
-
         // Ensure this storage stores number
-        const v = await ethers.provider.send("eth_getStorageAt", [tokenAddr, index])
+        const v = await getStorageAt(tokenAddress, index)
         let b: BigNumber
         try {
             b = BigNumber.from(v)
         } catch (e) {
             continue
         }
-
         // Probe to check if this storage is related to balance
         const p = b.add(1)
-        await setStorageNumber(tokenAddr, index, p)
+        await setStorageAt(tokenAddress, index, p)
         const pb = await tokenContract.balanceOf(account)
-        await setStorageNumber(tokenAddr, index, b)
+        await setStorageAt(tokenAddress, index, b)
 
         if (pb.eq(p)) {
             return i
         }
     }
-    throw new Error(`Cannot find balance storage slot for token ${tokenAddr}`)
+    throw new Error(`Cannot find balance storage slot for token ${tokenAddress}`)
 }
 
 function getStorageMapIndex(key: string, slot: number): string {
-    let index = ethers.utils.solidityKeccak256(["uint256", "uint256"], [key, slot])
-    // Remove padding for JSON RPC
-    while (index.startsWith("0x0")) {
-        index = "0x" + index.slice(3)
-    }
-    return index
+    return ethers.utils.solidityKeccak256(["uint256", "uint256"], [key, slot])
 }
 
-async function setStorageNumber(addr: string, index: string, value: BigNumberish) {
+function getStorageAt(address: string, index: string) {
+    return ethers.provider.send("eth_getStorageAt", [address, index])
+}
+
+async function setStorageAt(address: string, index: string, value: BytesConvertible) {
     await ethers.provider.send("hardhat_setStorageAt", [
-        addr,
-        index,
+        address,
+        // index here must be a QUANTITY value, which is a hex string without leading zeros
+        // (0xabc instead of 0x0abc)
+        ethers.utils.hexValue(index),
         toBytes32(BigNumber.from(value)),
     ])
 }
-
-// function toBytes32(bn: BigNumber): string {
-//     return ethers.utils.hexlify(ethers.utils.zeroPad(bn.toHexString(), 32))
-// }
