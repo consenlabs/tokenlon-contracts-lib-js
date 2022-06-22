@@ -112,4 +112,4 @@ contextSuite.skip = function (title: string, suite: (ctx: Context) => void) {
     return contextSuite(title, suite, "skip")
 }
 
-__ctx__.then(() => run())
+__ctx__.then(() => setTimeout(run, 0))
