@@ -59,15 +59,30 @@ contextSuite("AMMWrapperWithPath", ({ wallet, token, tokenlon, uniswap }) => {
         const tx = await tokenlon.UserProxy.connect(wallet.user).toAMM(payload)
         const receipt = await tx.wait()
 
-        assertSwappedByUniswapV3(receipt)
+        assertSwappedByUniswapV3(receipt, order)
     })
 
-    function assertSwappedByUniswapV3(receipt: ContractReceipt) {
-        assertSwapped(receipt, "Uniswap V3")
+    function assertSwappedByUniswapV3(receipt: ContractReceipt, order: AMMOrder) {
+        assertSwapped(receipt, "Uniswap V3", order)
     }
 
-    function assertSwapped(receipt: ContractReceipt, source: string) {
-        const { args } = parseLogsByName(tokenlon.AMMWrapperWithPath, "Swapped", receipt.logs)[0]
-        expect(args[0].source).to.equal(source)
+    function assertSwapped(receipt: ContractReceipt, source: string, order: AMMOrder) {
+        const {
+            args: [txMetaLog, orderLog],
+        } = parseLogsByName(tokenlon.AMMWrapperWithPath, "Swapped", receipt.logs)[0]
+
+        // Verify swapped source
+        expect(txMetaLog.source).to.equal(source)
+
+        // Verify order
+        expect(orderLog.makerAddr).to.equal(order.makerAddr)
+        expect(orderLog.takerAssetAddr).to.equal(order.takerAssetAddr)
+        expect(orderLog.makerAssetAddr).to.equal(order.makerAssetAddr)
+        expect(orderLog.takerAssetAmount.eq(order.takerAssetAmount)).to.be.true
+        expect(orderLog.makerAssetAmount.eq(order.makerAssetAmount)).to.be.true
+        expect(orderLog.userAddr).to.equal(order.userAddr)
+        expect(orderLog.receiverAddr).to.equal(order.receiverAddr)
+        expect(orderLog.salt.eq(order.salt)).to.be.true
+        expect(orderLog.deadline.eq(order.deadline)).to.be.true
     }
 })
