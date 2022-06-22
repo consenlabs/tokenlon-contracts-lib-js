@@ -3,6 +3,7 @@ import { ethers } from "hardhat"
 
 import network from "@network"
 import {
+    IAllowanceTarget,
     IAMMWrapperWithPath,
     IERC20,
     IUniswapV3Quoter,
@@ -23,6 +24,7 @@ export type Context = {
         DAI: IERC20
     }
     tokenlon: {
+        AllowanceTarget: IAllowanceTarget
         AMMWrapperWithPath: IAMMWrapperWithPath
         UserProxy: IUserProxy
     }
@@ -43,6 +45,10 @@ const __ctx__ = new Promise<Context>(async (resolve) =>
             DAI: await ethers.getContractAt("IERC20", network.DAI),
         },
         tokenlon: {
+            AllowanceTarget: await ethers.getContractAt(
+                "IAllowanceTarget",
+                network.AllowanceTarget,
+            ),
             AMMWrapperWithPath: await ethers.getContractAt(
                 "IAMMWrapperWithPath",
                 network.AMMWrapperWithPath,

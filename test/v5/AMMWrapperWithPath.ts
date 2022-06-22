@@ -2,7 +2,6 @@ import { expect } from "chai"
 import { ContractReceipt } from "ethers"
 import { ethers } from "hardhat"
 
-import network from "@network"
 import { AMMOrder, encoder, signer } from "@src/v5"
 import { SignatureType } from "@src/signer"
 import { UniswapV3Fee } from "@src/uniswap"
@@ -27,7 +26,7 @@ contextSuite("AMMWrapperWithPath", ({ wallet, token, tokenlon, uniswap }) => {
 
     before(async () => {
         await token.WETH.connect(wallet.user).approve(
-            network.AllowanceTarget,
+            tokenlon.AllowanceTarget.address,
             ethers.constants.MaxUint256,
         )
         await dealToken(wallet.user, token.WETH, defaultOrder.takerAssetAmount)
