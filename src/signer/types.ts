@@ -1,4 +1,4 @@
-import { TypedDataField, TypedDataSigner } from "@ethersproject/abstract-signer"
+import { TypedDataField } from "@ethersproject/abstract-signer"
 import { BytesLike } from "@ethersproject/bytes"
 
 export enum SignatureType {
@@ -46,4 +46,6 @@ export type EIP712Domain = {
 }
 export type EIP712Types = Record<string, TypedDataField[]>
 export type EIP712Value = Record<string, any>
-export interface EIP712Signer extends SignerInfo, TypedDataSigner {}
+export interface EIP712Signer extends SignerInfo {
+    _signTypedData(domain: EIP712Domain, types: EIP712Types, value: EIP712Value): Promise<string>
+}
