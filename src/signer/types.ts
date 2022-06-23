@@ -18,7 +18,7 @@ export type SigningOptions = {
 }
 
 export type SigningResult = {
-    txHash: string
+    structHash: string
     digest: string
     signature: string
 }

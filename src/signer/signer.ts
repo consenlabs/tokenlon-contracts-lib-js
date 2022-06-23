@@ -63,7 +63,7 @@ export abstract class Signer {
         options: SigningOptions,
     ): Promise<SigningResult> {
         const domain = await this.getEIP712Domain(options)
-        const txHash = _TypedDataEncoder.hashStruct(Object.keys(types)[0], types, value)
+        const structHash = _TypedDataEncoder.hashStruct(Object.keys(types)[0], types, value)
         const digest = _TypedDataEncoder.hash(domain, types, value)
         const typedDataSig =
             options.type === SignatureType.EthSign
@@ -72,7 +72,7 @@ export abstract class Signer {
         const paddedNonce = "00".repeat(32)
         const signature = typedDataSig + paddedNonce + options.type
         return {
-            txHash,
+            structHash,
             digest,
             signature,
         }
