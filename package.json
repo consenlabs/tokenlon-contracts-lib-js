@@ -6,7 +6,8 @@
   "license": "MIT",
   "scripts": {
     "build": "tsc -p ./tsconfig.build.json",
-    "lint": "tsc --noEmit && eslint --ignore-path .prettierignore \"./**/*.ts\" && prettier --check ."
+    "lint": "eslint --ignore-path .prettierignore \"./**/*.ts\" && prettier --check .",
+    "test": "hardhat test"
   },
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.0.6",
