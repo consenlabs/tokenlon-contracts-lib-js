@@ -1,4 +1,4 @@
-import { BigNumberish, ethers } from "ethers"
+import { ethers } from "ethers"
 
 import { UniswapV3Fee, encodeUniswapV3Path } from "../uniswap"
 import { abiAMMWrapperWithPath } from "./abi"

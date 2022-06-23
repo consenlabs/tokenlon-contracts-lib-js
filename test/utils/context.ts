@@ -40,8 +40,10 @@ export type Context = {
     snapshot: Snapshot
 }
 
-const __ctx__ = new Promise<Context>(async (resolve) =>
-    resolve({
+const __ctx__ = setupContext()
+
+async function setupContext(): Promise<Context> {
+    return {
         wallet: {
             user: new Wallet(toBytes32(1), ethers.provider),
         },
@@ -78,8 +80,8 @@ const __ctx__ = new Promise<Context>(async (resolve) =>
         },
         network,
         snapshot: await Snapshot.take(),
-    }),
-)
+    }
+}
 
 interface ContextSuiteFunction {
     (title: string, suite: (ctx: Context) => void, decorator?: "only" | "skip"): Promise<void>

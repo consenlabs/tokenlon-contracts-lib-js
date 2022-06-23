@@ -1,2 +1,6 @@
 .env
-node_modules/
+artifacts
+cache
+dist
+node_modules
+typechain-types
