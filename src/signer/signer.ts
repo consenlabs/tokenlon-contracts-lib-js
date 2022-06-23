@@ -1,14 +1,27 @@
 import crypto from "crypto"
-import { BigNumber } from "ethers"
+import { BigNumber, VoidSigner, ethers } from "ethers"
 import { _TypedDataEncoder } from "@ethersproject/hash"
 
-import { EIP712Domain, EIP712Types, EIP712Value, EIP712Signer, VoidEIP712Signer } from "./eip712"
-import { SignerOptions, SigningOptions, SigningResult } from "./types"
+import {
+    EIP712Domain,
+    EIP712Signer,
+    EIP712Types,
+    EIP712Value,
+    ETHSigner,
+    SignatureType,
+    SigningOptions,
+    SigningResult,
+} from "./types"
+
+export type SignerOptions = {
+    name: string
+    version: string
+}
 
 export abstract class Signer {
     public name: string
     public version: string
-    private signer: EIP712Signer = new VoidEIP712Signer()
+    private signer: ETHSigner | EIP712Signer = new VoidSigner("")
 
     public constructor(options: SignerOptions) {
         this.name = options.name
@@ -52,7 +65,10 @@ export abstract class Signer {
         const domain = await this.getEIP712Domain(options)
         const txHash = _TypedDataEncoder.hashStruct(Object.keys(types)[0], types, value)
         const digest = _TypedDataEncoder.hash(domain, types, value)
-        const typedDataSig = await this.signer._signTypedData(domain, types, value)
+        const typedDataSig =
+            options.type === SignatureType.EthSign
+                ? await (this.signer as ETHSigner).signMessage(ethers.utils.arrayify(digest))
+                : await (this.signer as EIP712Signer)._signTypedData(domain, types, value)
         const paddedNonce = "00".repeat(32)
         const signature = typedDataSig + paddedNonce + options.type
         return {

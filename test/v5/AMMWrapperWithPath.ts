@@ -59,11 +59,10 @@ contextSuite("AMMWrapperWithPath", ({ wallet, token, tokenlon, uniswap, network 
         assertSwappedByUniswapV2(receipt, order)
     })
 
-    it("Should sign and encode valid Uniswap v2 order for contract wallet", async () => {
+    it("Should sign and encode valid Uniswap v2 order for ERC1271 wallet", async () => {
         const erc1271Wallet = await (
             await ethers.getContractFactory("ERC1271Wallet", wallet.user)
         ).deploy()
-
         const path = [token.WETH.address, token.DAI.address]
         const order = {
             ...defaultOrder,
@@ -85,6 +84,38 @@ contextSuite("AMMWrapperWithPath", ({ wallet, token, tokenlon, uniswap, network 
 
         const { signature } = await signer.connect(wallet.user).signAMMOrder(order, {
             type: SignatureType.WalletBytes32,
+            verifyingContract: tokenlon.AMMWrapperWithPath.address,
+        })
+        const payload = encoder.encodeAMMTradeWithPath({
+            ...order,
+            feeFactor: 0,
+            signature,
+            makerSpecificData: "0x",
+            path,
+        })
+        const tx = await tokenlon.UserProxy.connect(wallet.user).toAMM(payload)
+        const receipt = await tx.wait()
+
+        assertSwappedByUniswapV2(receipt, order)
+    })
+
+    it("Should sign and encode valid Uniswap v2 order for ETH sign", async () => {
+        const path = [token.WETH.address, token.DAI.address]
+        const order = {
+            ...defaultOrder,
+            makerAddr: uniswap.UniswapV2Router.address,
+            takerAssetAddr: path[0],
+            makerAssetAddr: path[1],
+            takerAssetAmount: 100,
+        }
+        ;[, order.makerAssetAmount] = await uniswap.UniswapV2Router.callStatic.getAmountsOut(
+            order.takerAssetAmount,
+            path,
+        )
+        await giveFundToTrade(wallet.user, order.takerAssetAddr, order.takerAssetAmount)
+
+        const { signature } = await signer.connect(wallet.user).signAMMOrder(order, {
+            type: SignatureType.EthSign,
             verifyingContract: tokenlon.AMMWrapperWithPath.address,
         })
         const payload = encoder.encodeAMMTradeWithPath({
