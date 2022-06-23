@@ -6,6 +6,7 @@
   "license": "MIT",
   "scripts": {
     "build": "tsc -p ./tsconfig.build.json",
+    "compile-sol": "hardhat compile",
     "lint": "eslint --ignore-path .prettierignore \"./**/*.ts\" && prettier --check .",
     "test": "hardhat test"
   },

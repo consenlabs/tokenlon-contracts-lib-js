@@ -35,4 +35,6 @@ jobs:
           NETWORK: mainnet
           FORK_NODE_RPC_URL: ${{ secrets.MAINNET_NODE_RPC_URL }}
           FORK_BLOCK_NUMBER: 14995000
-        run: yarn run test
+        run: |
+          yarn run compile-sol
+          yarn run test
