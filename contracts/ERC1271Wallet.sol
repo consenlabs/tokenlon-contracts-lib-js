@@ -26,6 +26,8 @@ contract ERC1271Wallet {
 
     function isValidSignature(bytes32 hash, bytes memory signature) public view returns (bytes4) {
         require(owner == _ecrecover(hash, signature), "ERC1271Wallet: Invalid signature");
+        // bytes4(keccak256("isValidSignature(bytes32,bytes)"))
+        // Reference: https://eips.ethereum.org/EIPS/eip-1271#specification
         return 0x1626ba7e;
     }
 
