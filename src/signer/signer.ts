@@ -41,7 +41,7 @@ export abstract class Signer {
 
     /* utils */
 
-    public randomSalt(): BigNumber {
+    public generateRandomSalt(): BigNumber {
         const randomBytes = crypto.randomBytes(32)
         return BigNumber.from(randomBytes)
     }

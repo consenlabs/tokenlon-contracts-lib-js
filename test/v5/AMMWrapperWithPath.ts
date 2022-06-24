@@ -23,7 +23,7 @@ contextSuite("AMMWrapperWithPath", ({ wallet, token, tokenlon, uniswap, network 
         // Could override following fields at need
         userAddr: wallet.user.address,
         receiverAddr: wallet.user.address,
-        salt: signer.randomSalt(),
+        salt: signer.generateRandomSalt(),
         deadline: EXPIRY,
     }
 
