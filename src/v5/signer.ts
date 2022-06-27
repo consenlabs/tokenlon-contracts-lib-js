@@ -1,5 +1,3 @@
-import { _TypedDataEncoder } from "@ethersproject/hash"
-
 import { Signer as BaseSigner, SigningOptions } from "../signer"
 import { AMMOrder } from "./types"
 
