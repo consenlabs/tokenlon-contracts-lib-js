@@ -3,6 +3,10 @@ import "tsconfig-paths/register"
 import "@typechain/hardhat"
 import "@nomiclabs/hardhat-ethers"
 
+import chai from "chai"
+import chaiAsPromised from "chai-as-promised"
+chai.use(chaiAsPromised)
+
 const accounts = {
     mnemonic: process.env.MNEMONIC || "test test test test test test test test test test test junk",
     accountsBalance: "1000000000000000000000000",

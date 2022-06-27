@@ -1,7 +1,8 @@
 import crypto from "crypto"
-import { BigNumber, VoidSigner } from "ethers"
+import { BigNumber } from "ethers"
 import { _TypedDataEncoder } from "@ethersproject/hash"
 
+import { SignerNotConnectedError } from "../error"
 import {
     EIP712Domain,
     EIP712Signer,
@@ -16,11 +17,11 @@ export type SignerOptions = {
     version: string
 }
 
-export abstract class Signer {
+export class Signer {
     public name: string
     public version: string
 
-    private signer: EIP712Signer = new VoidSigner("")
+    private signer?: EIP712Signer
 
     public constructor(options: SignerOptions) {
         this.name = options.name
@@ -65,6 +66,9 @@ export abstract class Signer {
         value: EIP712Value,
         options: SigningOptions,
     ): Promise<string> {
+        if (!this.signer) {
+            throw new SignerNotConnectedError("Singer is not connected")
+        }
         const domain = this.getEIP712Domain(
             await this.signer.getChainId(),
             options.verifyingContract,
