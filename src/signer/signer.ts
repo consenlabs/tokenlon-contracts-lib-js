@@ -1,5 +1,5 @@
 import crypto from "crypto"
-import { BigNumber, VoidSigner, ethers } from "ethers"
+import { BigNumber, VoidSigner } from "ethers"
 import { _TypedDataEncoder } from "@ethersproject/hash"
 
 import {
@@ -7,10 +7,8 @@ import {
     EIP712Signer,
     EIP712Types,
     EIP712Value,
-    ETHSigner,
     SignatureType,
     SigningOptions,
-    SigningResult,
 } from "./types"
 
 export type SignerOptions = {
@@ -21,7 +19,8 @@ export type SignerOptions = {
 export abstract class Signer {
     public name: string
     public version: string
-    private signer: ETHSigner | EIP712Signer = new VoidSigner("")
+
+    private signer: EIP712Signer = new VoidSigner("")
 
     public constructor(options: SignerOptions) {
         this.name = options.name
@@ -39,42 +38,44 @@ export abstract class Signer {
         return result
     }
 
-    /* utils */
-
     public generateRandomSalt(): BigNumber {
         const randomBytes = crypto.randomBytes(32)
         return BigNumber.from(randomBytes)
     }
 
-    /* protected */
-
-    protected async getEIP712Domain(options: SigningOptions): Promise<EIP712Domain> {
+    public getEIP712Domain(chainId: number, verifyingContract: string): EIP712Domain {
         return {
             name: this.name,
             version: this.version,
-            chainId: await this.signer.getChainId(),
-            verifyingContract: options.verifyingContract,
+            chainId,
+            verifyingContract,
         }
     }
 
-    protected async signEIP712(
+    public getEIP712Digest(domain: EIP712Domain, types: EIP712Types, value: EIP712Value): string {
+        return _TypedDataEncoder.hash(domain, types, value)
+    }
+
+    public getEIP712StructHash(name: string, types: EIP712Types, value: EIP712Value): string {
+        return _TypedDataEncoder.hashStruct(name, types, value)
+    }
+
+    public async signEIP712(
         types: EIP712Types,
         value: EIP712Value,
         options: SigningOptions,
-    ): Promise<SigningResult> {
-        const domain = await this.getEIP712Domain(options)
-        const structHash = _TypedDataEncoder.hashStruct(Object.keys(types)[0], types, value)
-        const digest = _TypedDataEncoder.hash(domain, types, value)
-        const typedDataSig =
-            options.type === SignatureType.EthSign
-                ? await (this.signer as ETHSigner).signMessage(ethers.utils.arrayify(digest))
-                : await (this.signer as EIP712Signer)._signTypedData(domain, types, value)
+    ): Promise<string> {
+        const domain = this.getEIP712Domain(
+            await this.signer.getChainId(),
+            options.verifyingContract,
+        )
+        const signature = await this.signer._signTypedData(domain, types, value)
+        const signatureComposed = this.composeSignature(signature, options.type)
+        return signatureComposed
+    }
+
+    public composeSignature(signature: string, type: SignatureType) {
         const paddedNonce = "00".repeat(32)
-        const signature = typedDataSig + paddedNonce + options.type
-        return {
-            structHash,
-            digest,
-            signature,
-        }
+        return signature + paddedNonce + type
     }
 }

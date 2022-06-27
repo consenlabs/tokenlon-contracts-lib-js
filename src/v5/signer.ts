@@ -1,4 +1,6 @@
-import { Signer as BaseSigner, SigningOptions, SigningResult } from "../signer"
+import { _TypedDataEncoder } from "@ethersproject/hash"
+
+import { Signer as BaseSigner, SigningOptions } from "../signer"
 import { AMMOrder } from "./types"
 
 export class Signer extends BaseSigner {
@@ -11,8 +13,8 @@ export class Signer extends BaseSigner {
 
     /* AMM */
 
-    public async signAMMOrder(order: AMMOrder, options: SigningOptions): Promise<SigningResult> {
-        const types = {
+    public getEIP712AMMOrderTypes() {
+        return {
             tradeWithPermit: [
                 { name: "makerAddr", type: "address" },
                 { name: "takerAssetAddr", type: "address" },
@@ -25,6 +27,9 @@ export class Signer extends BaseSigner {
                 { name: "deadline", type: "uint256" },
             ],
         }
-        return this.signEIP712(types, order, options)
+    }
+
+    public async signAMMOrder(order: AMMOrder, options: SigningOptions): Promise<string> {
+        return this.signEIP712(this.getEIP712AMMOrderTypes(), order, options)
     }
 }

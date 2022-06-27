@@ -42,7 +42,7 @@ contextSuite("AMMWrapperWithPath", ({ wallet, token, tokenlon, uniswap, network 
         )
         await giveFundToTrade(wallet.user, order.takerAssetAddr, order.takerAssetAmount)
 
-        const { signature } = await signer.connect(wallet.user).signAMMOrder(order, {
+        const signature = await signer.connect(wallet.user).signAMMOrder(order, {
             type: SignatureType.EIP712,
             verifyingContract: tokenlon.AMMWrapperWithPath.address,
         })
@@ -82,40 +82,8 @@ contextSuite("AMMWrapperWithPath", ({ wallet, token, tokenlon, uniswap, network 
             .approve(tokenlon.AllowanceTarget.address, order.takerAssetAddr, order.takerAssetAmount)
         await dealToken(erc1271Wallet, order.takerAssetAddr, order.takerAssetAmount)
 
-        const { signature } = await signer.connect(wallet.user).signAMMOrder(order, {
+        const signature = await signer.connect(wallet.user).signAMMOrder(order, {
             type: SignatureType.WalletBytes32,
-            verifyingContract: tokenlon.AMMWrapperWithPath.address,
-        })
-        const payload = encoder.encodeAMMTradeWithPath({
-            ...order,
-            feeFactor: 0,
-            signature,
-            makerSpecificData: "0x",
-            path,
-        })
-        const tx = await tokenlon.UserProxy.connect(wallet.user).toAMM(payload)
-        const receipt = await tx.wait()
-
-        assertSwappedByUniswapV2(receipt, order)
-    })
-
-    it("Should sign and encode valid Uniswap v2 order for ETH sign", async () => {
-        const path = [token.WETH.address, token.DAI.address]
-        const order = {
-            ...defaultOrder,
-            makerAddr: uniswap.UniswapV2Router.address,
-            takerAssetAddr: path[0],
-            makerAssetAddr: path[1],
-            takerAssetAmount: 100,
-        }
-        ;[, order.makerAssetAmount] = await uniswap.UniswapV2Router.callStatic.getAmountsOut(
-            order.takerAssetAmount,
-            path,
-        )
-        await giveFundToTrade(wallet.user, order.takerAssetAddr, order.takerAssetAmount)
-
-        const { signature } = await signer.connect(wallet.user).signAMMOrder(order, {
-            type: SignatureType.EthSign,
             verifyingContract: tokenlon.AMMWrapperWithPath.address,
         })
         const payload = encoder.encodeAMMTradeWithPath({
@@ -149,7 +117,7 @@ contextSuite("AMMWrapperWithPath", ({ wallet, token, tokenlon, uniswap, network 
         )
         await giveFundToTrade(wallet.user, order.takerAssetAddr, order.takerAssetAmount)
 
-        const { signature } = await signer.connect(wallet.user).signAMMOrder(order, {
+        const signature = await signer.connect(wallet.user).signAMMOrder(order, {
             type: SignatureType.EIP712,
             verifyingContract: tokenlon.AMMWrapperWithPath.address,
         })
@@ -183,7 +151,7 @@ contextSuite("AMMWrapperWithPath", ({ wallet, token, tokenlon, uniswap, network 
         )
         await giveFundToTrade(wallet.user, order.takerAssetAddr, order.takerAssetAmount)
 
-        const { signature } = await signer.connect(wallet.user).signAMMOrder(order, {
+        const signature = await signer.connect(wallet.user).signAMMOrder(order, {
             type: SignatureType.EIP712,
             verifyingContract: tokenlon.AMMWrapperWithPath.address,
         })
@@ -215,7 +183,7 @@ contextSuite("AMMWrapperWithPath", ({ wallet, token, tokenlon, uniswap, network 
         order.makerAssetAmount = await curve3pool.callStatic.get_dy(1, 2, order.takerAssetAmount)
         await giveFundToTrade(wallet.user, order.takerAssetAddr, order.takerAssetAmount)
 
-        const { signature } = await signer.connect(wallet.user).signAMMOrder(order, {
+        const signature = await signer.connect(wallet.user).signAMMOrder(order, {
             type: SignatureType.EIP712,
             verifyingContract: tokenlon.AMMWrapperWithPath.address,
         })
