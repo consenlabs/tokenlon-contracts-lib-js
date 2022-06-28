@@ -1,6 +1,6 @@
 import { ethers } from "ethers"
 
-import { UniswapV3Fee, encodeUniswapV3Path } from "../uniswap"
+import { encodeUniswapV3Path } from "../uniswap"
 import { abiAMMWrapperWithPath } from "./abi"
 import { AMMTradeWithPathData } from "./types"
 
@@ -28,12 +28,12 @@ export class Encoder {
         ])
     }
 
-    public encodeAMMUniswapV3SingleHopData(fee: UniswapV3Fee): string {
+    public encodeAMMUniswapV3SingleHopData(fee: number): string {
         const swapType = 1
         return ethers.utils.defaultAbiCoder.encode(["uint8", "uint24"], [swapType, fee])
     }
 
-    public encodeAMMUniswapV3MultiHopsData(path: string[], fees: UniswapV3Fee[]): string {
+    public encodeAMMUniswapV3MultiHopsData(path: string[], fees: number[]): string {
         const swapType = 2
         const uniswapV3Path = encodeUniswapV3Path(path, fees)
         return ethers.utils.defaultAbiCoder.encode(["uint8", "bytes"], [swapType, uniswapV3Path])

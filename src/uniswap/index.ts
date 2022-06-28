@@ -1,12 +1,13 @@
 const FEE_SIZE = 3
 
 export enum UniswapV3Fee {
+    LOWEST = 100,
     LOW = 500,
     MEDIUM = 3000,
     HIGH = 10000,
 }
 
-export function encodeUniswapV3Path(path: string[], fees: UniswapV3Fee[]): string {
+export function encodeUniswapV3Path(path: string[], fees: number[]): string {
     if (path.length != fees.length + 1) {
         throw new Error("path/fee lengths do not match")
     }
