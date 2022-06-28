@@ -53,10 +53,14 @@ export class Signer {
         }
     }
 
+    // Reference: https://eips.ethereum.org/EIPS/eip-712#specification
+    // "\x19\x01" ‖ hashStruct(domain) ‖ hashStruct(types, value)
     public getEIP712Digest(domain: EIP712Domain, types: EIP712Types, value: EIP712Value): string {
         return _TypedDataEncoder.hash(domain, types, value)
     }
 
+    // Reference: https://eips.ethereum.org/EIPS/eip-712#definition-of-hashstruct
+    // keccak256(keccak256(encodeType(types[name]) ‖ encodeData(value))
     public getEIP712StructHash(name: string, types: EIP712Types, value: EIP712Value): string {
         return _TypedDataEncoder.hashStruct(name, types, value)
     }
