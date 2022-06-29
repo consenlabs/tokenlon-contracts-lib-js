@@ -13,6 +13,7 @@ export enum SignatureType {
 
 export type SigningOptions = {
     type: SignatureType
+    signer: EIP712Signer
     verifyingContract: string
 }
 

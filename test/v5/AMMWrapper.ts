@@ -44,8 +44,9 @@ contextSuite("AMMWrapper", ({ wallet, token, tokenlon, uniswap }) => {
         )
         await dealToken(wallet.user, token.WETH, order.takerAssetAmount)
 
-        const signature = await signer.connect(wallet.user).signAMMOrder(order, {
+        const signature = await signer.signAMMOrder(order, {
             type: SignatureType.EIP712,
+            signer: wallet.user,
             verifyingContract: tokenlon.AMMWrapper.address,
         })
         const payload = encoder.encodeAMMTrade({

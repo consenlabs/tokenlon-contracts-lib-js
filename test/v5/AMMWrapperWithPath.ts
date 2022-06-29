@@ -45,8 +45,9 @@ contextSuite("AMMWrapperWithPath", ({ wallet, token, tokenlon, uniswap, network 
         )
         await dealToken(wallet.user, token.WETH, order.takerAssetAmount)
 
-        const signature = await signer.connect(wallet.user).signAMMOrder(order, {
+        const signature = await signer.signAMMOrder(order, {
             type: SignatureType.EIP712,
+            signer: wallet.user,
             verifyingContract: tokenlon.AMMWrapperWithPath.address,
         })
         const payload = encoder.encodeAMMTradeWithPath({
@@ -85,8 +86,9 @@ contextSuite("AMMWrapperWithPath", ({ wallet, token, tokenlon, uniswap, network 
             .approve(tokenlon.AllowanceTarget.address, order.takerAssetAddr, order.takerAssetAmount)
         await dealToken(erc1271Wallet, order.takerAssetAddr, order.takerAssetAmount)
 
-        const signature = await signer.connect(wallet.user).signAMMOrder(order, {
+        const signature = await signer.signAMMOrder(order, {
             type: SignatureType.WalletBytes32,
+            signer: wallet.user,
             verifyingContract: tokenlon.AMMWrapperWithPath.address,
         })
         const payload = encoder.encodeAMMTradeWithPath({
@@ -124,8 +126,9 @@ contextSuite("AMMWrapperWithPath", ({ wallet, token, tokenlon, uniswap, network 
         )
         await dealToken(wallet.user, token.WETH, order.takerAssetAmount)
 
-        const signature = await signer.connect(wallet.user).signAMMOrder(order, {
+        const signature = await signer.signAMMOrder(order, {
             type: SignatureType.EIP712,
+            signer: wallet.user,
             verifyingContract: tokenlon.AMMWrapperWithPath.address,
         })
         const makerSpecificData = encoder.encodeAMMUniswapV3SingleHopData(UniswapV3Fee.LOW)
@@ -162,8 +165,9 @@ contextSuite("AMMWrapperWithPath", ({ wallet, token, tokenlon, uniswap, network 
         )
         await dealToken(wallet.user, token.WETH, order.takerAssetAmount)
 
-        const signature = await signer.connect(wallet.user).signAMMOrder(order, {
+        const signature = await signer.signAMMOrder(order, {
             type: SignatureType.EIP712,
+            signer: wallet.user,
             verifyingContract: tokenlon.AMMWrapperWithPath.address,
         })
         const makerSpecificData = encoder.encodeAMMUniswapV3MultiHopsData(path, fees)
@@ -199,8 +203,9 @@ contextSuite("AMMWrapperWithPath", ({ wallet, token, tokenlon, uniswap, network 
         )
         await dealToken(wallet.user, token.USDC, order.takerAssetAmount)
 
-        const signature = await signer.connect(wallet.user).signAMMOrder(order, {
+        const signature = await signer.signAMMOrder(order, {
             type: SignatureType.EIP712,
+            signer: wallet.user,
             verifyingContract: tokenlon.AMMWrapperWithPath.address,
         })
         const makerSpecificData = encoder.encodeAMMCurveData(1)
