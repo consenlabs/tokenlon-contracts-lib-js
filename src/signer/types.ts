@@ -1,14 +1,9 @@
 import { TypedDataField } from "@ethersproject/abstract-signer"
 
 export enum SignatureType {
-    Illegal = "00", // 0x00, default value
-    Invalid = "01", // 0x01
-    EIP712 = "02", // 0x02
-    EthSign = "03", // 0x03
-    WalletBytes = "04", // 0x04  standard 1271 wallet type
-    WalletBytes32 = "05", // 0x05  standard 1271 wallet type
-    Wallet = "06", // 0x06  0x wallet type for signature compatibility
-    NSignatureTypes = "07", // 0x07, number of signature types. Always leave at end.
+    EIP712 = "02",
+    WalletBytes = "04", // ERC1271 wallet type (isValidSignature(bytes,bytes))
+    WalletBytes32 = "05", // ERC1271 wallet type (isValidSignature(bytes32,bytes))
 }
 
 export type SigningOptions = {
