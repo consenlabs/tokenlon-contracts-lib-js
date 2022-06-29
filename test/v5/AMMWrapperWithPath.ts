@@ -1,12 +1,11 @@
 import { expect } from "chai"
-import { BigNumberish, ContractReceipt, Signer } from "ethers"
+import { ContractReceipt } from "ethers"
 import { ethers } from "hardhat"
 
 import { AMMOrder, encoder, signer } from "@src/v5"
 import { SignatureType } from "@src/signer"
 import { UniswapV3Fee, encodeUniswapV3Path } from "@src/uniswap"
 
-import { Addressable, getAddress } from "@test/utils/address"
 import { dealToken } from "@test/utils/balance"
 import { EXPIRY } from "@test/utils/constant"
 import { contextSuite } from "@test/utils/context"
@@ -40,7 +39,11 @@ contextSuite("AMMWrapperWithPath", ({ wallet, token, tokenlon, uniswap, network 
             order.takerAssetAmount,
             path,
         )
-        await giveFundToTrade(wallet.user, order.takerAssetAddr, order.takerAssetAmount)
+        await token.WETH.connect(wallet.user).approve(
+            tokenlon.AllowanceTarget.address,
+            order.takerAssetAmount,
+        )
+        await dealToken(wallet.user, token.WETH, order.takerAssetAmount)
 
         const signature = await signer.connect(wallet.user).signAMMOrder(order, {
             type: SignatureType.EIP712,
@@ -56,7 +59,7 @@ contextSuite("AMMWrapperWithPath", ({ wallet, token, tokenlon, uniswap, network 
         const tx = await tokenlon.UserProxy.connect(wallet.user).toAMM(payload)
         const receipt = await tx.wait()
 
-        assertSwappedByUniswapV2(receipt, order)
+        assertSwapped(receipt, order)
     })
 
     it("Should sign and encode valid Uniswap v2 order for ERC1271 wallet", async () => {
@@ -96,7 +99,7 @@ contextSuite("AMMWrapperWithPath", ({ wallet, token, tokenlon, uniswap, network 
         const tx = await tokenlon.UserProxy.connect(wallet.user).toAMM(payload)
         const receipt = await tx.wait()
 
-        assertSwappedByUniswapV2(receipt, order)
+        assertSwapped(receipt, order)
     })
 
     it("Should sign and encode valid Uniswap v3 single hop order", async () => {
@@ -115,7 +118,11 @@ contextSuite("AMMWrapperWithPath", ({ wallet, token, tokenlon, uniswap, network 
             order.takerAssetAmount,
             0,
         )
-        await giveFundToTrade(wallet.user, order.takerAssetAddr, order.takerAssetAmount)
+        await token.WETH.connect(wallet.user).approve(
+            tokenlon.AllowanceTarget.address,
+            order.takerAssetAmount,
+        )
+        await dealToken(wallet.user, token.WETH, order.takerAssetAmount)
 
         const signature = await signer.connect(wallet.user).signAMMOrder(order, {
             type: SignatureType.EIP712,
@@ -132,7 +139,7 @@ contextSuite("AMMWrapperWithPath", ({ wallet, token, tokenlon, uniswap, network 
         const tx = await tokenlon.UserProxy.connect(wallet.user).toAMM(payload)
         const receipt = await tx.wait()
 
-        assertSwappedByUniswapV3(receipt, order)
+        assertSwapped(receipt, order)
     })
 
     it("Should sign and encode valid Uniswap v3 multi hops order", async () => {
@@ -149,7 +156,11 @@ contextSuite("AMMWrapperWithPath", ({ wallet, token, tokenlon, uniswap, network 
             encodeUniswapV3Path(path, fees),
             order.takerAssetAmount,
         )
-        await giveFundToTrade(wallet.user, order.takerAssetAddr, order.takerAssetAmount)
+        await token.WETH.connect(wallet.user).approve(
+            tokenlon.AllowanceTarget.address,
+            order.takerAssetAmount,
+        )
+        await dealToken(wallet.user, token.WETH, order.takerAssetAmount)
 
         const signature = await signer.connect(wallet.user).signAMMOrder(order, {
             type: SignatureType.EIP712,
@@ -166,7 +177,7 @@ contextSuite("AMMWrapperWithPath", ({ wallet, token, tokenlon, uniswap, network 
         const tx = await tokenlon.UserProxy.connect(wallet.user).toAMM(payload)
         const receipt = await tx.wait()
 
-        assertSwappedByUniswapV3(receipt, order)
+        assertSwapped(receipt, order)
     })
 
     it("Should sign and encode valid Curve v1 order", async () => {
@@ -181,7 +192,12 @@ contextSuite("AMMWrapperWithPath", ({ wallet, token, tokenlon, uniswap, network 
         }
         // In 3 pool, USDC has index of 1, and USDT has index of 2.
         order.makerAssetAmount = await curve3pool.callStatic.get_dy(1, 2, order.takerAssetAmount)
-        await giveFundToTrade(wallet.user, order.takerAssetAddr, order.takerAssetAmount)
+
+        await token.USDC.connect(wallet.user).approve(
+            tokenlon.AllowanceTarget.address,
+            order.takerAssetAmount,
+        )
+        await dealToken(wallet.user, token.USDC, order.takerAssetAmount)
 
         const signature = await signer.connect(wallet.user).signAMMOrder(order, {
             type: SignatureType.EIP712,
@@ -198,44 +214,23 @@ contextSuite("AMMWrapperWithPath", ({ wallet, token, tokenlon, uniswap, network 
         const tx = await tokenlon.UserProxy.connect(wallet.user).toAMM(payload)
         const receipt = await tx.wait()
 
-        assertSwappedByCurve(receipt, order)
+        assertSwapped(receipt, order)
     })
 
-    async function giveFundToTrade(target: Signer, token: Addressable, amount: BigNumberish) {
-        const tokenContract = await ethers.getContractAt("IERC20", await getAddress(token))
-        await tokenContract.connect(target).approve(tokenlon.AllowanceTarget.address, amount)
-        await dealToken(target, token, amount)
-    }
-
-    function assertSwappedByUniswapV2(receipt: ContractReceipt, order: AMMOrder) {
-        assertSwapped(receipt, "Uniswap V2", order)
-    }
-
-    function assertSwappedByUniswapV3(receipt: ContractReceipt, order: AMMOrder) {
-        assertSwapped(receipt, "Uniswap V3", order)
-    }
-
-    function assertSwappedByCurve(receipt: ContractReceipt, order: AMMOrder) {
-        assertSwapped(receipt, "Curve", order)
-    }
-
-    function assertSwapped(receipt: ContractReceipt, source: string, order: AMMOrder) {
+    function assertSwapped(receipt: ContractReceipt, order: AMMOrder) {
         const {
-            args: [txMetaLog, orderLog],
+            args: [, orderLog],
         } = parseLogsByName(tokenlon.AMMWrapperWithPath, "Swapped", receipt.logs)[0]
-
-        // Verify swapped source
-        expect(txMetaLog.source).to.equal(source)
 
         // Verify order
         expect(orderLog.makerAddr).to.equal(order.makerAddr)
         expect(orderLog.takerAssetAddr).to.equal(order.takerAssetAddr)
         expect(orderLog.makerAssetAddr).to.equal(order.makerAssetAddr)
-        expect(orderLog.takerAssetAmount.eq(order.takerAssetAmount)).to.be.true
-        expect(orderLog.makerAssetAmount.eq(order.makerAssetAmount)).to.be.true
+        expect(orderLog.takerAssetAmount).to.equal(order.takerAssetAmount)
+        expect(orderLog.makerAssetAmount).to.equal(order.makerAssetAmount)
         expect(orderLog.userAddr).to.equal(order.userAddr)
         expect(orderLog.receiverAddr).to.equal(order.receiverAddr)
-        expect(orderLog.salt.eq(order.salt)).to.be.true
-        expect(orderLog.deadline.eq(order.deadline)).to.be.true
+        expect(orderLog.salt).to.equal(order.salt)
+        expect(orderLog.deadline).to.equal(order.deadline)
     }
 })

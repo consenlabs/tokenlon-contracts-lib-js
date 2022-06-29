@@ -2,6 +2,7 @@ import "dotenv/config"
 import "tsconfig-paths/register"
 import "@typechain/hardhat"
 import "@nomiclabs/hardhat-ethers"
+import "@nomiclabs/hardhat-waffle"
 
 import chai from "chai"
 import chaiAsPromised from "chai-as-promised"
