@@ -3,9 +3,12 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
+      "@src/*": ["./src/*"],
+      "@network": ["./network"],
+      "@test/*": ["./test/*"],
       "@typechain": ["./typechain-types"]
     }
   },
-  "include": ["typechain-types", "src", "test"],
+  "include": ["src", "test", "typechain-types"],
   "files": ["hardhat.config.ts"]
 }
