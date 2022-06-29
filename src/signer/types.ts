@@ -6,13 +6,16 @@ export enum SignatureType {
     WalletBytes32 = "05", // ERC1271 wallet type (isValidSignature(bytes32,bytes))
 }
 
-export type SigningOptions = {
+export type SigningOptions = EIP712DomainOptions & {
     type: SignatureType
-    signer: EIP712Signer
-    verifyingContract: string
 }
 
 /* EIP712 */
+
+export type EIP712DomainOptions = {
+    signer: EIP712Signer
+    verifyingContract: string
+}
 
 export type EIP712Domain = {
     name: string

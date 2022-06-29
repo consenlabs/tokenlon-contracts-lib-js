@@ -2,7 +2,14 @@ import crypto from "crypto"
 import { BigNumber } from "ethers"
 import { _TypedDataEncoder } from "@ethersproject/hash"
 
-import { EIP712Domain, EIP712Types, EIP712Value, SignatureType, SigningOptions } from "./types"
+import {
+    EIP712Domain,
+    EIP712DomainOptions,
+    EIP712Types,
+    EIP712Value,
+    SignatureType,
+    SigningOptions,
+} from "./types"
 
 export type SignerOptions = {
     name: string
@@ -23,12 +30,12 @@ export class Signer {
         return BigNumber.from(randomBytes)
     }
 
-    public getEIP712Domain(chainId: number, verifyingContract: string): EIP712Domain {
+    public async getEIP712Domain(options: EIP712DomainOptions): Promise<EIP712Domain> {
         return {
             name: this.name,
             version: this.version,
-            chainId,
-            verifyingContract,
+            chainId: await options.signer.getChainId(),
+            verifyingContract: options.verifyingContract,
         }
     }
 
@@ -49,10 +56,7 @@ export class Signer {
         value: EIP712Value,
         options: SigningOptions,
     ): Promise<string> {
-        const domain = this.getEIP712Domain(
-            await options.signer.getChainId(),
-            options.verifyingContract,
-        )
+        const domain = await this.getEIP712Domain(options)
         const signature = await options.signer._signTypedData(domain, types, value)
         const signatureComposed = this.composeSignature(signature, options.type)
         return signatureComposed

@@ -1,4 +1,4 @@
-import { Signer as BaseSigner, SigningOptions } from "../signer"
+import { EIP712DomainOptions, Signer as BaseSigner, SigningOptions } from "../signer"
 import { AMMOrder } from "./types"
 
 export class Signer extends BaseSigner {
@@ -27,9 +27,16 @@ export class Signer extends BaseSigner {
         }
     }
 
+    public async getAMMOrderEIP712Digest(order: AMMOrder, options: EIP712DomainOptions) {
+        return this.getEIP712Digest(
+            await this.getEIP712Domain(options),
+            this.getAMMOrderEIP712Types(),
+            order,
+        )
+    }
+
     public getAMMOrderEIP712StructHash(order: AMMOrder) {
-        const types = this.getAMMOrderEIP712Types()
-        return this.getEIP712StructHash("tradeWithPermit", types, order)
+        return this.getEIP712StructHash("tradeWithPermit", this.getAMMOrderEIP712Types(), order)
     }
 
     public async signAMMOrder(order: AMMOrder, options: SigningOptions): Promise<string> {
