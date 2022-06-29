@@ -19,16 +19,16 @@ interface IAMMWrapper {
     );
 
     function trade(
-        address _makerAddress,
-        address _fromAssetAddress,
-        address _toAssetAddress,
+        address _makerAddr,
+        address _takerAssetAddr,
+        address _makerAssetAddr,
         uint256 _takerAssetAmount,
         uint256 _makerAssetAmount,
         uint256 _feeFactor,
-        address _spender,
-        address payable _receiver,
-        uint256 _nonce,
+        address _userAddr,
+        address payable _receiverAddr,
+        uint256 _salt,
         uint256 _deadline,
-        bytes memory _sig
+        bytes calldata _sig
     ) external payable returns (uint256);
 }

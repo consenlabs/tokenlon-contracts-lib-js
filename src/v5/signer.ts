@@ -11,7 +11,7 @@ export class Signer extends BaseSigner {
 
     /* AMM */
 
-    public getEIP712AMMOrderTypes() {
+    public getAMMOrderEIP712Types() {
         return {
             tradeWithPermit: [
                 { name: "makerAddr", type: "address" },
@@ -27,7 +27,12 @@ export class Signer extends BaseSigner {
         }
     }
 
+    public getAMMOrderEIP712StructHash(order: AMMOrder) {
+        const types = this.getAMMOrderEIP712Types()
+        return this.getEIP712StructHash("tradeWithPermit", types, order)
+    }
+
     public async signAMMOrder(order: AMMOrder, options: SigningOptions): Promise<string> {
-        return this.signEIP712(this.getEIP712AMMOrderTypes(), order, options)
+        return this.signEIP712(this.getAMMOrderEIP712Types(), order, options)
     }
 }

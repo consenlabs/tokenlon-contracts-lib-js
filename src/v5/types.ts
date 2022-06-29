@@ -1,4 +1,4 @@
-import { BigNumberish } from "ethers"
+import { BigNumberish, BytesLike } from "ethers"
 
 export type AMMOrder = {
     makerAddr: string
@@ -12,6 +12,20 @@ export type AMMOrder = {
     deadline: number
 }
 
+export type AMMTradeData = {
+    makerAddr: string
+    takerAssetAddr: string
+    makerAssetAddr: string
+    takerAssetAmount: BigNumberish
+    makerAssetAmount: BigNumberish
+    feeFactor: BigNumberish
+    userAddr: string
+    receiverAddr: string
+    salt: BigNumberish
+    deadline: number
+    signature: BytesLike
+}
+
 export type AMMTradeWithPathData = {
     makerAddr: string
     takerAssetAddr: string
@@ -23,7 +37,7 @@ export type AMMTradeWithPathData = {
     salt: BigNumberish
     deadline: number
     feeFactor: number
-    signature: string
+    signature: BytesLike
     makerSpecificData: string
     path: string[]
 }

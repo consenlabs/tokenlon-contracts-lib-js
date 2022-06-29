@@ -4,6 +4,7 @@ import { ethers } from "hardhat"
 import network, { Network } from "@network"
 import {
     IAllowanceTarget,
+    IAMMWrapper,
     IAMMWrapperWithPath,
     IERC20,
     IUniswapV2Router,
@@ -28,6 +29,7 @@ export type Context = {
     }
     tokenlon: {
         AllowanceTarget: IAllowanceTarget
+        AMMWrapper: IAMMWrapper
         AMMWrapperWithPath: IAMMWrapperWithPath
         UserProxy: IUserProxy
     }
@@ -45,7 +47,7 @@ const __ctx__ = setupContext()
 async function setupContext(): Promise<Context> {
     return {
         wallet: {
-            user: new Wallet(toBytes32(1), ethers.provider),
+            user: Wallet.createRandom().connect(ethers.provider),
         },
         token: {
             DAI: await ethers.getContractAt("IERC20", network.DAI),
@@ -58,6 +60,7 @@ async function setupContext(): Promise<Context> {
                 "IAllowanceTarget",
                 network.AllowanceTarget,
             ),
+            AMMWrapper: await ethers.getContractAt("IAMMWrapper", network.AMMWrapperWithPath),
             AMMWrapperWithPath: await ethers.getContractAt(
                 "IAMMWrapperWithPath",
                 network.AMMWrapperWithPath,
