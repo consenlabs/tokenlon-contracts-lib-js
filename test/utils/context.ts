@@ -14,7 +14,6 @@ import {
 } from "@typechain"
 
 import { dealETH } from "./balance"
-import { toBytes32 } from "./bytes"
 import { Snapshot } from "./snapshot"
 
 export type Context = {
