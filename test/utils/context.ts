@@ -6,11 +6,12 @@ import {
     IAllowanceTarget,
     IAMMWrapper,
     IAMMWrapperWithPath,
+    IRFQ,
+    IUserProxy,
     IERC20,
     IUniswapV2Router,
     IUniswapV3Quoter,
     IUniswapV3Router,
-    IUserProxy,
 } from "@typechain"
 
 import { dealETH } from "./balance"
@@ -30,6 +31,7 @@ export type Context = {
         AllowanceTarget: IAllowanceTarget
         AMMWrapper: IAMMWrapper
         AMMWrapperWithPath: IAMMWrapperWithPath
+        RFQ: IRFQ
         UserProxy: IUserProxy
     }
     uniswap: {
@@ -64,6 +66,7 @@ async function setupContext(): Promise<Context> {
                 "IAMMWrapperWithPath",
                 network.AMMWrapperWithPath,
             ),
+            RFQ: await ethers.getContractAt("IRFQ", network.RFQ),
             UserProxy: await ethers.getContractAt("IUserProxy", network.UserProxy),
         },
         uniswap: {

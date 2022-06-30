@@ -10,6 +10,7 @@ export type Network = {
     // Tokenlon
     AllowanceTarget: string
     AMMWrapperWithPath: string
+    RFQ: string
     UserProxy: string
 
     // Uniswap

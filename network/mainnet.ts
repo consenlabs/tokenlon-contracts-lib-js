@@ -8,6 +8,7 @@ export default {
     // Tokenlon
     AllowanceTarget: "0x8A42d311D282Bfcaa5133b2DE0a8bCDBECea3073",
     AMMWrapperWithPath: "0x4a14347083B80E5216cA31350a2D21702aC3650d",
+    RFQ: "0xfD6C2d2499b1331101726A8AC68CCc9Da3fAB54F",
     UserProxy: "0x03f34bE1BF910116595dB1b11E9d1B2cA5D59659",
 
     // Uniswap
