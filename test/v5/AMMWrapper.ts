@@ -7,7 +7,7 @@ import { SignatureType } from "@src/signer"
 import { dealToken } from "@test/utils/balance"
 import { EXPIRY } from "@test/utils/constant"
 import { contextSuite } from "@test/utils/context"
-import { parseLogsByName } from "@test/utils/contract"
+import { deployERC1271Wallet, parseLogsByName } from "@test/utils/contract"
 
 contextSuite("AMMWrapper", ({ wallet, token, tokenlon, uniswap }) => {
     const defaultOrder: AMMOrder = {
@@ -46,6 +46,44 @@ contextSuite("AMMWrapper", ({ wallet, token, tokenlon, uniswap }) => {
 
         const signature = await signer.signAMMOrder(order, {
             type: SignatureType.EIP712,
+            signer: wallet.user,
+            verifyingContract: tokenlon.AMMWrapper.address,
+        })
+        const payload = encoder.encodeAMMTrade({
+            ...order,
+            feeFactor: 0,
+            signature,
+        })
+        const tx = await tokenlon.UserProxy.connect(wallet.user).toAMM(payload)
+        const receipt = await tx.wait()
+
+        assertSwapped(receipt, order)
+    })
+
+    it("Should sign and encode valid order for ERC1271 wallet", async () => {
+        const erc1271Wallet = await deployERC1271Wallet(wallet.user)
+        const order = {
+            ...defaultOrder,
+            makerAddr: uniswap.UniswapV2Router.address,
+            takerAssetAddr: token.WETH.address,
+            makerAssetAddr: token.DAI.address,
+            takerAssetAmount: 100,
+            userAddr: erc1271Wallet.address,
+            receiverAddr: erc1271Wallet.address,
+        }
+        order.makerAssetAmount = (
+            await uniswap.UniswapV2Router.getAmountsOut(order.takerAssetAmount, [
+                order.takerAssetAddr,
+                order.makerAssetAddr,
+            ])
+        )[1]
+        await erc1271Wallet
+            .connect(wallet.user)
+            .approve(tokenlon.AllowanceTarget.address, order.takerAssetAddr, order.takerAssetAmount)
+        await dealToken(erc1271Wallet, order.takerAssetAddr, order.takerAssetAmount)
+
+        const signature = await signer.signAMMOrder(order, {
+            type: SignatureType.WalletBytes32,
             signer: wallet.user,
             verifyingContract: tokenlon.AMMWrapper.address,
         })

@@ -9,7 +9,7 @@ import { UniswapV3Fee, encodeUniswapV3Path } from "@src/uniswap"
 import { dealToken } from "@test/utils/balance"
 import { EXPIRY } from "@test/utils/constant"
 import { contextSuite } from "@test/utils/context"
-import { parseLogsByName } from "@test/utils/contract"
+import { deployERC1271Wallet, parseLogsByName } from "@test/utils/contract"
 
 contextSuite("AMMWrapperWithPath", ({ wallet, token, tokenlon, uniswap, network }) => {
     const defaultOrder: AMMOrder = {
@@ -64,9 +64,7 @@ contextSuite("AMMWrapperWithPath", ({ wallet, token, tokenlon, uniswap, network 
     })
 
     it("Should sign and encode valid Uniswap v2 order for ERC1271 wallet", async () => {
-        const erc1271Wallet = await (
-            await ethers.getContractFactory("ERC1271Wallet", wallet.user)
-        ).deploy()
+        const erc1271Wallet = await deployERC1271Wallet(wallet.user)
         const path = [token.WETH.address, token.DAI.address]
         const order = {
             ...defaultOrder,
