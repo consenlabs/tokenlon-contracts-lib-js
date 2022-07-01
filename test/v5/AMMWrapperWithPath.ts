@@ -6,7 +6,7 @@ import { AMMOrder, encoder, signer } from "@src/v5"
 import { SignatureType } from "@src/signer"
 import { UniswapV3Fee, encodeUniswapV3Path } from "@src/uniswap"
 
-import { dealToken } from "@test/utils/balance"
+import { dealTokenAndApprove } from "@test/utils/balance"
 import { EXPIRY } from "@test/utils/constant"
 import { contextSuite } from "@test/utils/context"
 import { deployERC1271Wallet, parseLogsByName } from "@test/utils/contract"
@@ -39,12 +39,12 @@ contextSuite("AMMWrapperWithPath", ({ wallet, token, tokenlon, uniswap, network 
             order.takerAssetAmount,
             path,
         )
-        await token.WETH.connect(wallet.user).approve(
-            tokenlon.AllowanceTarget.address,
+        await dealTokenAndApprove(
+            wallet.user,
+            tokenlon.AllowanceTarget,
+            order.takerAssetAddr,
             order.takerAssetAmount,
         )
-        await dealToken(wallet.user, token.WETH, order.takerAssetAmount)
-
         const signature = await signer.signAMMOrder(order, {
             type: SignatureType.EIP712,
             signer: wallet.user,
@@ -79,11 +79,15 @@ contextSuite("AMMWrapperWithPath", ({ wallet, token, tokenlon, uniswap, network 
             order.takerAssetAmount,
             path,
         )
-        await erc1271Wallet
-            .connect(wallet.user)
-            .approve(tokenlon.AllowanceTarget.address, order.takerAssetAddr, order.takerAssetAmount)
-        await dealToken(erc1271Wallet, order.takerAssetAddr, order.takerAssetAmount)
-
+        await dealTokenAndApprove(
+            wallet.user,
+            tokenlon.AllowanceTarget,
+            order.takerAssetAddr,
+            order.takerAssetAmount,
+            {
+                walletContract: erc1271Wallet,
+            },
+        )
         const signature = await signer.signAMMOrder(order, {
             type: SignatureType.WalletBytes32,
             signer: wallet.user,
@@ -118,12 +122,12 @@ contextSuite("AMMWrapperWithPath", ({ wallet, token, tokenlon, uniswap, network 
             order.takerAssetAmount,
             0,
         )
-        await token.WETH.connect(wallet.user).approve(
-            tokenlon.AllowanceTarget.address,
+        await dealTokenAndApprove(
+            wallet.user,
+            tokenlon.AllowanceTarget,
+            order.takerAssetAddr,
             order.takerAssetAmount,
         )
-        await dealToken(wallet.user, token.WETH, order.takerAssetAmount)
-
         const signature = await signer.signAMMOrder(order, {
             type: SignatureType.EIP712,
             signer: wallet.user,
@@ -157,12 +161,12 @@ contextSuite("AMMWrapperWithPath", ({ wallet, token, tokenlon, uniswap, network 
             encodeUniswapV3Path(path, fees),
             order.takerAssetAmount,
         )
-        await token.WETH.connect(wallet.user).approve(
-            tokenlon.AllowanceTarget.address,
+        await dealTokenAndApprove(
+            wallet.user,
+            tokenlon.AllowanceTarget,
+            order.takerAssetAddr,
             order.takerAssetAmount,
         )
-        await dealToken(wallet.user, token.WETH, order.takerAssetAmount)
-
         const signature = await signer.signAMMOrder(order, {
             type: SignatureType.EIP712,
             signer: wallet.user,
@@ -195,12 +199,12 @@ contextSuite("AMMWrapperWithPath", ({ wallet, token, tokenlon, uniswap, network 
         // In 3 pool, USDC has index of 1, and USDT has index of 2.
         order.makerAssetAmount = await curve3pool.callStatic.get_dy(1, 2, order.takerAssetAmount)
 
-        await token.USDC.connect(wallet.user).approve(
-            tokenlon.AllowanceTarget.address,
+        await dealTokenAndApprove(
+            wallet.user,
+            tokenlon.AllowanceTarget,
+            order.takerAssetAddr,
             order.takerAssetAmount,
         )
-        await dealToken(wallet.user, token.USDC, order.takerAssetAmount)
-
         const signature = await signer.signAMMOrder(order, {
             type: SignatureType.EIP712,
             signer: wallet.user,
@@ -221,9 +225,11 @@ contextSuite("AMMWrapperWithPath", ({ wallet, token, tokenlon, uniswap, network 
     })
 
     function assertSwapped(receipt: ContractReceipt, order: AMMOrder) {
-        const {
-            args: [, orderLog],
-        } = parseLogsByName(tokenlon.AMMWrapperWithPath, "Swapped", receipt.logs)[0]
+        const [
+            {
+                args: [, orderLog],
+            },
+        ] = parseLogsByName(tokenlon.AMMWrapperWithPath, "Swapped", receipt.logs)
 
         // Verify order
         expect(orderLog.makerAddr).to.equal(order.makerAddr)
