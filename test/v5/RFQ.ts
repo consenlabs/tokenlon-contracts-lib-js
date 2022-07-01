@@ -8,7 +8,7 @@ import { SignatureType } from "@src/signer"
 import { dealETH, dealTokenAndApprove } from "@test/utils/balance"
 import { EXPIRY } from "@test/utils/constant"
 import { contextSuite } from "@test/utils/context"
-import { parseLogsByName } from "@test/utils/contract"
+import { deployERC1271Wallet, parseLogsByName } from "@test/utils/contract"
 
 contextSuite("RFQ", ({ wallet, token, tokenlon }) => {
     const maker = Wallet.createRandom().connect(ethers.provider)
@@ -42,6 +42,44 @@ contextSuite("RFQ", ({ wallet, token, tokenlon }) => {
         )
         const makerSignature = await signer.signRFQMakerOrder(order, {
             type: SignatureType.EIP712,
+            signer: maker,
+            verifyingContract: tokenlon.RFQ.address,
+        })
+        const takerSignature = await signer.signRFQTakerOrder(order, {
+            type: SignatureType.EIP712,
+            signer: wallet.user,
+            verifyingContract: tokenlon.RFQ.address,
+        })
+        const payload = encoder.encodeRFQFill({
+            ...order,
+            makerSignature,
+            takerSignature,
+        })
+        const tx = await tokenlon.UserProxy.connect(wallet.user).toRFQ(payload, {
+            value: order.takerAssetAmount,
+        })
+        const receipt = await tx.wait()
+
+        assertFilled(receipt, order)
+    })
+
+    it("Should sign and encode valid order for ERC1271 wallet", async () => {
+        const makerERC1271Wallet = await deployERC1271Wallet(maker)
+        const order = {
+            ...defaultOrder,
+            makerAddr: makerERC1271Wallet.address,
+        }
+        await dealTokenAndApprove(
+            maker,
+            tokenlon.AllowanceTarget,
+            token.DAI,
+            order.makerAssetAmount,
+            {
+                walletContract: makerERC1271Wallet,
+            },
+        )
+        const makerSignature = await signer.signRFQMakerOrder(order, {
+            type: SignatureType.WalletBytes32,
             signer: maker,
             verifyingContract: tokenlon.RFQ.address,
         })

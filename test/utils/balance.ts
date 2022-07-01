@@ -1,5 +1,13 @@
-import { BigNumber, BigNumberish, Signer } from "ethers"
+import {
+    BaseContract,
+    BigNumber,
+    BigNumberish,
+    ContractTransaction,
+    Overrides,
+    Signer,
+} from "ethers"
 import { ethers } from "hardhat"
+
 import { Addressable, getAddress } from "./address"
 import { BytesConvertible, toBytes32 } from "./bytes"
 
@@ -17,13 +25,35 @@ export async function dealToken(target: Addressable, token: Addressable, amount:
     await setStorageAt(await getAddress(token), index, BigNumber.from(amount))
 }
 
+export interface WalletContract extends BaseContract {
+    connect(signer: Signer): this
+    approve(
+        spender: string,
+        tokenAddr: string,
+        amount: BigNumberish,
+        overrides?: Overrides & { from?: string },
+    ): Promise<ContractTransaction>
+}
+
 export async function dealTokenAndApprove(
     target: Signer,
     spender: Addressable,
     token: Addressable,
     amount: BigNumberish,
+    options: {
+        walletContract?: WalletContract
+    } = {},
 ) {
-    await dealToken(target, token, amount)
+    const targetAddr = await getAddress(options.walletContract ?? target)
+
+    await dealToken(targetAddr, token, amount)
+
+    if (options.walletContract) {
+        await options.walletContract
+            .connect(target)
+            .approve(await getAddress(spender), await getAddress(token), amount)
+        return
+    }
     const tokenContract = await ethers.getContractAt("IERC20", await getAddress(token))
     await tokenContract.connect(target).approve(await getAddress(spender), amount)
 }
