@@ -31,11 +31,9 @@ export class Signer extends BaseSigner {
         order: AMMOrder,
         options: EIP712DomainOptions,
     ): Promise<string> {
-        return this.getEIP712Digest(
-            await this.getEIP712Domain(options),
-            this.getAMMOrderEIP712Types(),
-            order,
-        )
+        const domain = await this.getEIP712Domain(options)
+        const types = this.getAMMOrderEIP712Types()
+        return this.getEIP712Digest(domain, types, order)
     }
 
     public getAMMOrderEIP712StructHash(order: AMMOrder): string {
@@ -68,11 +66,9 @@ export class Signer extends BaseSigner {
         order: RFQMakerOrder,
         options: EIP712DomainOptions,
     ): Promise<string> {
-        return this.getEIP712Digest(
-            await this.getEIP712Domain(options),
-            this.getRFQMakerOrderEIP712Types(),
-            order,
-        )
+        const domain = await this.getEIP712Domain(options)
+        const types = this.getRFQMakerOrderEIP712Types()
+        return this.getEIP712Digest(domain, types, order)
     }
 
     public getRFQMakerOrderEIP712StructHash(order: RFQMakerOrder): string {
@@ -106,11 +102,9 @@ export class Signer extends BaseSigner {
         order: RFQTakerOrder,
         options: EIP712DomainOptions,
     ): Promise<string> {
-        return this.getEIP712Digest(
-            await this.getEIP712Domain(options),
-            this.getRFQTakerOrderEIP712Types(),
-            order,
-        )
+        const domain = await this.getEIP712Domain(options)
+        const types = this.getRFQTakerOrderEIP712Types()
+        return this.getEIP712Digest(domain, types, order)
     }
 
     public getRFQTakerOrderEIP712StructHash(order: RFQTakerOrder): string {
