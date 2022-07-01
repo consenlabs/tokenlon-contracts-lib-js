@@ -6,6 +6,10 @@ export async function deployERC1271Wallet(owner: Signer) {
     return (await ethers.getContractFactory("ERC1271Wallet", owner)).deploy()
 }
 
+export async function deployERC1271WalletETHSign(owner: Signer) {
+    return (await ethers.getContractFactory("ERC1271WalletETHSign", owner)).deploy()
+}
+
 export function parseLogsByName(contract: Contract, eventName: string, logs: Log[]) {
     const topic = contract.interface.getEventTopic(eventName)
     return logs
