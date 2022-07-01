@@ -13,7 +13,7 @@ import { deployERC1271Wallet, parseLogsByName } from "@test/utils/contract"
 
 contextSuite("AMMWrapperWithPath", ({ wallet, token, tokenlon, uniswap, network }) => {
     const defaultOrder: AMMOrder = {
-        // Should fill out following fields by case
+        // Should fill following fields in each case
         makerAddr: "0x",
         takerAssetAddr: "0x",
         makerAssetAddr: "0x",

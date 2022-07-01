@@ -1,4 +1,4 @@
-import { BigNumber, BigNumberish } from "ethers"
+import { BigNumber, BigNumberish, Signer } from "ethers"
 import { ethers } from "hardhat"
 import { Addressable, getAddress } from "./address"
 import { BytesConvertible, toBytes32 } from "./bytes"
@@ -15,6 +15,17 @@ export async function dealToken(target: Addressable, token: Addressable, amount:
     const slot = await probeBalanceStorageSlot(await getAddress(token))
     const index = getStorageMapIndex(await getAddress(target), slot)
     await setStorageAt(await getAddress(token), index, BigNumber.from(amount))
+}
+
+export async function dealTokenAndApprove(
+    target: Signer,
+    spender: Addressable,
+    token: Addressable,
+    amount: BigNumberish,
+) {
+    await dealToken(target, token, amount)
+    const tokenContract = await ethers.getContractAt("IERC20", await getAddress(token))
+    await tokenContract.connect(target).approve(await getAddress(spender), amount)
 }
 
 async function probeBalanceStorageSlot(token: Addressable): Promise<number> {
