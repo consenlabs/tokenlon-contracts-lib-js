@@ -1,6 +1,25 @@
-const network = process.env.NETWORK
+export enum Network {
+    Mainnet = "mainnet",
+    Arbitrum = "arbitrum",
+}
 
-export type Network = {
+const network = (() => {
+    const network = process.env.NETWORK
+    switch (network) {
+        case Network.Arbitrum:
+            return Network.Arbitrum
+        case Network.Mainnet:
+            return Network.Mainnet
+        default:
+            throw new Error(`Unknown network ${network}`)
+    }
+})()
+
+export function isNetwork(...networks: Network[]): boolean {
+    return networks.includes(network)
+}
+
+export type Address = {
     // Token
     DAI: string
     USDC: string
@@ -23,4 +42,4 @@ export type Network = {
     Curve3Pool: string
 }
 
-export default require(`./${network}.ts`).default as Network
+export const address = require(`./${network}.ts`).default as Address

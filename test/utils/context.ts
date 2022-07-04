@@ -1,7 +1,7 @@
 import { Wallet } from "ethers"
 import { ethers } from "hardhat"
 
-import network, { Network } from "@network"
+import { Address, address } from "@network"
 import {
     IAllowanceTarget,
     IAMMWrapper,
@@ -39,7 +39,7 @@ export type Context = {
         UniswapV3Quoter: IUniswapV3Quoter
         UniswapV3Router: IUniswapV3Router
     }
-    network: Network
+    address: Address
     snapshot: Snapshot
 }
 
@@ -51,39 +51,39 @@ async function setupContext(): Promise<Context> {
             user: Wallet.createRandom().connect(ethers.provider),
         },
         token: {
-            DAI: await ethers.getContractAt("IERC20", network.DAI),
-            USDC: await ethers.getContractAt("IERC20", network.USDC),
-            USDT: await ethers.getContractAt("IERC20", network.USDT),
-            WETH: await ethers.getContractAt("IERC20", network.WETH),
+            DAI: await ethers.getContractAt("IERC20", address.DAI),
+            USDC: await ethers.getContractAt("IERC20", address.USDC),
+            USDT: await ethers.getContractAt("IERC20", address.USDT),
+            WETH: await ethers.getContractAt("IERC20", address.WETH),
         },
         tokenlon: {
             AllowanceTarget: await ethers.getContractAt(
                 "IAllowanceTarget",
-                network.AllowanceTarget,
+                address.AllowanceTarget,
             ),
-            AMMWrapper: await ethers.getContractAt("IAMMWrapper", network.AMMWrapper),
+            AMMWrapper: await ethers.getContractAt("IAMMWrapper", address.AMMWrapper),
             AMMWrapperWithPath: await ethers.getContractAt(
                 "IAMMWrapperWithPath",
-                network.AMMWrapperWithPath,
+                address.AMMWrapperWithPath,
             ),
-            RFQ: await ethers.getContractAt("IRFQ", network.RFQ),
-            UserProxy: await ethers.getContractAt("IUserProxy", network.UserProxy),
+            RFQ: await ethers.getContractAt("IRFQ", address.RFQ),
+            UserProxy: await ethers.getContractAt("IUserProxy", address.UserProxy),
         },
         uniswap: {
             UniswapV2Router: await ethers.getContractAt(
                 "IUniswapV2Router",
-                network.UniswapV2Router,
+                address.UniswapV2Router,
             ),
             UniswapV3Quoter: await ethers.getContractAt(
                 "IUniswapV3Quoter",
-                network.UniswapV3Quoter,
+                address.UniswapV3Quoter,
             ),
             UniswapV3Router: await ethers.getContractAt(
                 "IUniswapV3Router",
-                network.UniswapV3Router,
+                address.UniswapV3Router,
             ),
         },
-        network,
+        address,
         snapshot: await Snapshot.take(),
     }
 }
