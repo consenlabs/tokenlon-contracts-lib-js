@@ -30,6 +30,7 @@ export type Address = {
     AllowanceTarget: string
     AMMWrapper: string
     AMMWrapperWithPath: string
+    LimitOrder: string
     RFQ: string
     UserProxy: string
 

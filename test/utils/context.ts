@@ -6,6 +6,7 @@ import {
     IAllowanceTarget,
     IAMMWrapper,
     IAMMWrapperWithPath,
+    ILimitOrder,
     IRFQ,
     IUserProxy,
     IERC20,
@@ -31,6 +32,7 @@ export type Context = {
         AllowanceTarget: IAllowanceTarget
         AMMWrapper: IAMMWrapper
         AMMWrapperWithPath: IAMMWrapperWithPath
+        LimitOrder: ILimitOrder
         RFQ: IRFQ
         UserProxy: IUserProxy
     }
@@ -66,6 +68,7 @@ async function setupContext(): Promise<Context> {
                 "IAMMWrapperWithPath",
                 address.AMMWrapperWithPath,
             ),
+            LimitOrder: await ethers.getContractAt("ILimitOrder", address.LimitOrder),
             RFQ: await ethers.getContractAt("IRFQ", address.RFQ),
             UserProxy: await ethers.getContractAt("IUserProxy", address.UserProxy),
         },
