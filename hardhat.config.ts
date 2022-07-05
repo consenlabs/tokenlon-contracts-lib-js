@@ -12,7 +12,7 @@ const accounts = {
 module.exports = {
     networks: {
         hardhat: {
-            chainId: 1,
+            chainId: parseInt(process.env.CHAIN_ID!, 10),
             accounts,
             forking: {
                 url: process.env.FORK_NODE_RPC_URL,
