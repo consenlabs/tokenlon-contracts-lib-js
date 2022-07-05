@@ -44,6 +44,53 @@ export type AMMTradeWithPathData = {
     path: string[]
 }
 
+/* Limit Order */
+
+export type LimitOrder = {
+    makerToken: string
+    takerToken: string
+    makerTokenAmount: BigNumberish
+    takerTokenAmount: BigNumberish
+    maker: string
+    taker: string
+    salt: BigNumberish
+    expiry: number
+}
+
+export type LimitOrderFill = {
+    orderHash: string // LimitOrder EIP712 digest
+    taker: string
+    recipient: string
+    takerTokenAmount: BigNumberish
+    takerSalt: BigNumberish
+    expiry: number
+}
+
+export type LimitOrderAllowFill = {
+    orderHash: string // LimitOrder EIP712 digest
+    executor: string
+    fillAmount: BigNumberish
+    salt: BigNumberish
+    expiry: number
+}
+
+export type LimitOrderFillByTraderData = {
+    // maker
+    order: LimitOrder
+    makerSignature: BytesLike
+
+    // taker
+    fill: LimitOrderFill
+    takerSignature: BytesLike
+
+    // coordinator
+    allowFill: {
+        salt: BigNumberish
+        expiry: number
+    }
+    coordinatorSignature: BytesLike
+}
+
 /* RFQ */
 
 export type RFQOrder = {

@@ -2,7 +2,12 @@ import { ethers } from "ethers"
 
 import { encodeUniswapV3Path } from "../uniswap"
 import abi from "./abi"
-import { AMMTradeData, AMMTradeWithPathData, RFQFillData } from "./types"
+import {
+    AMMTradeData,
+    AMMTradeWithPathData,
+    LimitOrderFillByTraderData,
+    RFQFillData,
+} from "./types"
 
 export class Encoder {
     /* AMM */
@@ -58,6 +63,34 @@ export class Encoder {
 
     public encodeAMMCurveData(version: number): string {
         return ethers.utils.defaultAbiCoder.encode(["uint8"], [version])
+    }
+
+    /* Limit Order */
+
+    public encodeLimitOrderFillByTrader(data: LimitOrderFillByTraderData) {
+        const i = new ethers.utils.Interface(abi.LimitOrder)
+        return i.encodeFunctionData("fillLimitOrderByTrader", [
+            [
+                data.order.makerToken,
+                data.order.takerToken,
+                data.order.makerTokenAmount,
+                data.order.takerTokenAmount,
+                data.order.maker,
+                data.order.taker,
+                data.order.salt,
+                data.order.expiry,
+            ],
+            data.makerSignature,
+            [
+                data.fill.taker,
+                data.fill.recipient,
+                data.fill.takerTokenAmount,
+                data.fill.takerSalt,
+                data.fill.expiry,
+                data.takerSignature,
+            ],
+            [data.coordinatorSignature, data.allowFill.salt, data.allowFill.expiry],
+        ])
     }
 
     /* RFQ */
