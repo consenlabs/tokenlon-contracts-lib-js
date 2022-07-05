@@ -19,7 +19,7 @@ if (isNetwork(Network.Mainnet)) {
             makerAssetAddr: "0x",
             takerAssetAmount: 0,
             makerAssetAmount: 0,
-            // Could override following fields at need
+            // Could override following fields at need in each case
             userAddr: wallet.user.address,
             receiverAddr: wallet.user.address,
             salt: signer.generateRandomSalt(),

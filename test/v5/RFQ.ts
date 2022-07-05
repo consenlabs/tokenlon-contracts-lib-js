@@ -19,7 +19,7 @@ if (isNetwork(Network.Mainnet)) {
     contextSuite("RFQ", ({ wallet, token, tokenlon }) => {
         const maker = Wallet.createRandom().connect(ethers.provider)
         const defaultOrder: RFQOrder = {
-            // Could override following fields at need
+            // Could override following fields at need in each case
             takerAddr: wallet.user.address,
             makerAddr: maker.address,
             takerAssetAddr: token.WETH.address,
