@@ -9,6 +9,7 @@ export type Network = {
 
     // Tokenlon
     AllowanceTarget: string
+    AMMWrapper: string
     AMMWrapperWithPath: string
     UserProxy: string
 

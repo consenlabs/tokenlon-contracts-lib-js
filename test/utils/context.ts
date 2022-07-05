@@ -59,7 +59,7 @@ async function setupContext(): Promise<Context> {
                 "IAllowanceTarget",
                 network.AllowanceTarget,
             ),
-            AMMWrapper: await ethers.getContractAt("IAMMWrapper", network.AMMWrapperWithPath),
+            AMMWrapper: await ethers.getContractAt("IAMMWrapper", network.AMMWrapper),
             AMMWrapperWithPath: await ethers.getContractAt(
                 "IAMMWrapperWithPath",
                 network.AMMWrapperWithPath,
