@@ -91,6 +91,36 @@ export type LimitOrderFillByTraderData = {
     coordinatorSignature: BytesLike
 }
 
+export enum LimitOrderProtocol {
+    UniswapV3,
+    Sushiswap,
+}
+
+export type LimitOrderProtocolData = {
+    protocol: LimitOrderProtocol
+    data: string
+    profitRecipient: string
+    takerTokenAmount: BigNumberish
+    protocolOutMinimum: BigNumberish
+    expiry: number
+}
+
+export type LimitOrderFillByProtocolData = {
+    // maker
+    order: LimitOrder
+    makerSignature: BytesLike
+
+    // protocol
+    protocol: LimitOrderProtocolData
+
+    // coordinator
+    allowFill: {
+        salt: BigNumberish
+        expiry: number
+    }
+    coordinatorSignature: BytesLike
+}
+
 /* RFQ */
 
 export type RFQOrder = {

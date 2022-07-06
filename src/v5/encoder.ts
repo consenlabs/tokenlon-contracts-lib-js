@@ -5,6 +5,7 @@ import abi from "./abi"
 import {
     AMMTradeData,
     AMMTradeWithPathData,
+    LimitOrderFillByProtocolData,
     LimitOrderFillByTraderData,
     RFQFillData,
 } from "./types"
@@ -88,6 +89,32 @@ export class Encoder {
                 data.fill.takerSalt,
                 data.fill.expiry,
                 data.takerSignature,
+            ],
+            [data.coordinatorSignature, data.allowFill.salt, data.allowFill.expiry],
+        ])
+    }
+
+    public encodeLimitOrderFillByProtocol(data: LimitOrderFillByProtocolData) {
+        const i = new ethers.utils.Interface(abi.LimitOrder)
+        return i.encodeFunctionData("fillLimitOrderByProtocol", [
+            [
+                data.order.makerToken,
+                data.order.takerToken,
+                data.order.makerTokenAmount,
+                data.order.takerTokenAmount,
+                data.order.maker,
+                data.order.taker,
+                data.order.salt,
+                data.order.expiry,
+            ],
+            data.makerSignature,
+            [
+                data.protocol.protocol,
+                data.protocol.data,
+                data.protocol.profitRecipient,
+                data.protocol.takerTokenAmount,
+                data.protocol.protocolOutMinimum,
+                data.protocol.expiry,
             ],
             [data.coordinatorSignature, data.allowFill.salt, data.allowFill.expiry],
         ])

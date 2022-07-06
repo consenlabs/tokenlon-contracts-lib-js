@@ -1,5 +1,6 @@
 export default {
     AMMWrapper: [
+        /* trade */
         {
             inputs: [
                 {
@@ -71,6 +72,7 @@ export default {
         },
     ],
     AMMWrapperWithPath: [
+        /* trade */
         {
             inputs: [
                 {
@@ -159,6 +161,7 @@ export default {
         },
     ],
     LimitOrder: [
+        /* fillLimitOrderByTrader */
         {
             inputs: [
                 {
@@ -289,8 +292,135 @@ export default {
             stateMutability: "nonpayable",
             type: "function",
         },
+        /* fillLimitOrderByProtocol */
+        {
+            inputs: [
+                {
+                    components: [
+                        {
+                            internalType: "address",
+                            name: "makerToken",
+                            type: "address",
+                        },
+                        {
+                            internalType: "address",
+                            name: "takerToken",
+                            type: "address",
+                        },
+                        {
+                            internalType: "uint256",
+                            name: "makerTokenAmount",
+                            type: "uint256",
+                        },
+                        {
+                            internalType: "uint256",
+                            name: "takerTokenAmount",
+                            type: "uint256",
+                        },
+                        {
+                            internalType: "address",
+                            name: "maker",
+                            type: "address",
+                        },
+                        {
+                            internalType: "address",
+                            name: "taker",
+                            type: "address",
+                        },
+                        {
+                            internalType: "uint256",
+                            name: "salt",
+                            type: "uint256",
+                        },
+                        {
+                            internalType: "uint64",
+                            name: "expiry",
+                            type: "uint64",
+                        },
+                    ],
+                    internalType: "struct ILimitOrder.Order",
+                    name: "_order",
+                    type: "tuple",
+                },
+                {
+                    internalType: "bytes",
+                    name: "_orderMakerSig",
+                    type: "bytes",
+                },
+                {
+                    components: [
+                        {
+                            internalType: "enum ILimitOrder.Protocol",
+                            name: "protocol",
+                            type: "uint8",
+                        },
+                        {
+                            internalType: "bytes",
+                            name: "data",
+                            type: "bytes",
+                        },
+                        {
+                            internalType: "address",
+                            name: "profitRecipient",
+                            type: "address",
+                        },
+                        {
+                            internalType: "uint256",
+                            name: "takerTokenAmount",
+                            type: "uint256",
+                        },
+                        {
+                            internalType: "uint256",
+                            name: "protocolOutMinimum",
+                            type: "uint256",
+                        },
+                        {
+                            internalType: "uint64",
+                            name: "expiry",
+                            type: "uint64",
+                        },
+                    ],
+                    internalType: "struct ILimitOrder.ProtocolParams",
+                    name: "_params",
+                    type: "tuple",
+                },
+                {
+                    components: [
+                        {
+                            internalType: "bytes",
+                            name: "sig",
+                            type: "bytes",
+                        },
+                        {
+                            internalType: "uint256",
+                            name: "salt",
+                            type: "uint256",
+                        },
+                        {
+                            internalType: "uint64",
+                            name: "expiry",
+                            type: "uint64",
+                        },
+                    ],
+                    internalType: "struct ILimitOrder.CoordinatorParams",
+                    name: "_crdParams",
+                    type: "tuple",
+                },
+            ],
+            name: "fillLimitOrderByProtocol",
+            outputs: [
+                {
+                    internalType: "uint256",
+                    name: "",
+                    type: "uint256",
+                },
+            ],
+            stateMutability: "nonpayable",
+            type: "function",
+        },
     ],
     RFQ: [
+        /* fill */
         {
             inputs: [
                 {
