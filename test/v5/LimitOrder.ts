@@ -13,7 +13,7 @@ import {
     signer,
 } from "@src/v5"
 import { SignatureType } from "@src/signer"
-import { UniswapV3Fee, encodeUniswapV3Path } from "@src/uniswap"
+import { UniswapV3Fee } from "@src/uniswap"
 
 import { dealETH, dealTokenAndApprove } from "@test/utils/balance"
 import { EXPIRY } from "@test/utils/constant"
@@ -21,7 +21,7 @@ import { contextSuite } from "@test/utils/context"
 import { deployERC1271Wallet, parseLogsByName } from "@test/utils/contract"
 
 if (isNetwork(Network.Arbitrum)) {
-    contextSuite("LimitOrder", ({ token, tokenlon, uniswap, wallet }) => {
+    contextSuite("LimitOrder", ({ token, tokenlon, uniswap, sushiswap, wallet }) => {
         const coordinator = Wallet.createRandom().connect(ethers.provider)
         const maker = Wallet.createRandom().connect(ethers.provider)
         const defaultOrder: LimitOrder = {
@@ -245,11 +245,78 @@ if (isNetwork(Network.Arbitrum)) {
         })
 
         describe("fillLimitOrderByProtocol", () => {
-            it("Should sign and encode valid order", async () => {
+            it("Should sign and encode valid Sushiswap order", async () => {
                 const order = {
                     ...defaultOrder,
                 }
-                const uniswapV3Path = encodeUniswapV3Path(
+                const path = [order.makerToken, order.takerToken]
+                ;[, order.takerTokenAmount] =
+                    await sushiswap.SushiswapRouter.callStatic.getAmountsOut(
+                        order.makerTokenAmount,
+                        path,
+                    )
+
+                await dealTokenAndApprove(
+                    maker,
+                    tokenlon.AllowanceTarget,
+                    order.makerToken,
+                    order.makerTokenAmount,
+                )
+
+                // maker
+                const orderHash = await signer.getLimitOrderEIP712Digest(order, {
+                    signer: maker,
+                    verifyingContract: tokenlon.LimitOrder.address,
+                })
+                const makerSignature = await signer.signLimitOrder(order, {
+                    type: SignatureType.EIP712,
+                    signer: maker,
+                    verifyingContract: tokenlon.LimitOrder.address,
+                })
+
+                // protocol
+                const sushiswapPath = encoder.encodePath(path)
+                const protocol: LimitOrderProtocolData = {
+                    protocol: LimitOrderProtocol.Sushiswap,
+                    data: sushiswapPath,
+                    profitRecipient: wallet.user.address,
+                    takerTokenAmount: order.takerTokenAmount,
+                    protocolOutMinimum: order.takerTokenAmount,
+                    expiry: EXPIRY,
+                }
+
+                // coordinator
+                const allowFill: LimitOrderAllowFill = {
+                    orderHash,
+                    executor: wallet.user.address,
+                    fillAmount: order.takerTokenAmount,
+                    salt: signer.generateRandomSalt(),
+                    expiry: EXPIRY,
+                }
+                const coordinatorSignature = await signer.signLimitOrderAllowFill(allowFill, {
+                    type: SignatureType.EIP712,
+                    signer: coordinator,
+                    verifyingContract: tokenlon.LimitOrder.address,
+                })
+
+                const payload = encoder.encodeLimitOrderFillByProtocol({
+                    order,
+                    makerSignature,
+                    protocol,
+                    allowFill,
+                    coordinatorSignature,
+                })
+                const tx = await tokenlon.UserProxy.connect(wallet.user).toLimitOrder(payload)
+                const receipt = await tx.wait()
+
+                await assertFilledByProtocol(receipt, order, protocol, allowFill)
+            })
+
+            it("Should sign and encode valid Uniswap v3 order", async () => {
+                const order = {
+                    ...defaultOrder,
+                }
+                const uniswapV3Path = encoder.encodeUniswapV3Path(
                     [order.makerToken, order.takerToken],
                     [UniswapV3Fee.LOW],
                 )
@@ -313,14 +380,14 @@ if (isNetwork(Network.Arbitrum)) {
                 await assertFilledByProtocol(receipt, order, protocol, allowFill)
             })
 
-            it("Should sign and encode valid order for ERC1271 wallet", async () => {
+            it("Should sign and encode valid Uniswap v3 order for ERC1271 wallet", async () => {
                 const makerERC1271Wallet = await deployERC1271Wallet(maker)
 
                 const order = {
                     ...defaultOrder,
                     maker: makerERC1271Wallet.address,
                 }
-                const uniswapV3Path = encodeUniswapV3Path(
+                const uniswapV3Path = encoder.encodeUniswapV3Path(
                     [order.makerToken, order.takerToken],
                     [UniswapV3Fee.LOW],
                 )
@@ -405,7 +472,7 @@ if (isNetwork(Network.Arbitrum)) {
                     }),
                 )
                 expect(args.maker).to.equal(order.maker)
-                expect(args.taker).to.equal(uniswap.UniswapV3Router.address)
+                expect(args.taker).to.equal(getProtocolAddress(protocol.protocol))
                 expect(args.allowFillHash).to.equal(
                     await signer.getLimitOrderAllowFillEIP712Digest(allowFill, {
                         signer: coordinator,
@@ -421,6 +488,17 @@ if (isNetwork(Network.Arbitrum)) {
                 expect(fillReceipt.makerTokenFilledAmount).to.equal(order.makerTokenAmount)
                 expect(fillReceipt.takerTokenFilledAmount).to.equal(order.takerTokenAmount)
                 expect(fillReceipt.remainingAmount).to.equal(0)
+            }
+
+            function getProtocolAddress(protocol: LimitOrderProtocol): string {
+                switch (protocol) {
+                    case LimitOrderProtocol.UniswapV3:
+                        return uniswap.UniswapV3Router.address
+                    case LimitOrderProtocol.Sushiswap:
+                        return sushiswap.SushiswapRouter.address
+                    default:
+                        throw new Error(`Unknown protocol ${protocol}`)
+                }
             }
         })
     })

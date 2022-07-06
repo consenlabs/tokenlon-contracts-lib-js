@@ -5,7 +5,7 @@ import { ethers } from "hardhat"
 import { Network, isNetwork } from "@network"
 import { AMMOrder, encoder, signer } from "@src/v5"
 import { SignatureType } from "@src/signer"
-import { UniswapV3Fee, encodeUniswapV3Path } from "@src/uniswap"
+import { UniswapV3Fee } from "@src/uniswap"
 
 import { dealTokenAndApprove } from "@test/utils/balance"
 import { EXPIRY } from "@test/utils/constant"
@@ -160,7 +160,7 @@ if (isNetwork(Network.Mainnet)) {
                 takerAssetAmount: 100,
             }
             order.makerAssetAmount = await uniswap.UniswapV3Quoter.callStatic.quoteExactInput(
-                encodeUniswapV3Path(path, fees),
+                encoder.encodeUniswapV3Path(path, fees),
                 order.takerAssetAmount,
             )
             await dealTokenAndApprove(

@@ -2,8 +2,8 @@ import { EIP712DomainOptions, EIP712Types, Signer as BaseSigner, SigningOptions 
 import {
     AMMOrder,
     LimitOrder,
-    LimitOrderFill,
     LimitOrderAllowFill,
+    LimitOrderFill,
     RFQFill,
     RFQOrder,
 } from "./types"

@@ -141,4 +141,14 @@ export class Encoder {
             data.takerSignature,
         ])
     }
+
+    /* Vendor */
+
+    public encodePath(path: string[]) {
+        return ethers.utils.defaultAbiCoder.encode(["address[]"], [path])
+    }
+
+    public encodeUniswapV3Path(path: string[], fees: number[]) {
+        return encodeUniswapV3Path(path, fees)
+    }
 }
