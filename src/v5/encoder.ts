@@ -1,14 +1,31 @@
 import { ethers } from "ethers"
 
 import { encodeUniswapV3Path } from "../uniswap"
-import { abiAMMWrapperWithPath } from "./abi"
-import { AMMTradeWithPathData } from "./types"
+import abi from "./abi"
+import { AMMTradeData, AMMTradeWithPathData } from "./types"
 
 export class Encoder {
     /* AMM */
 
+    public encodeAMMTrade(data: AMMTradeData): string {
+        const i = new ethers.utils.Interface(abi.AMMWrapper)
+        return i.encodeFunctionData("trade", [
+            data.makerAddr,
+            data.takerAssetAddr,
+            data.makerAssetAddr,
+            data.takerAssetAmount,
+            data.makerAssetAmount,
+            data.feeFactor,
+            data.userAddr,
+            data.receiverAddr,
+            data.salt,
+            data.deadline,
+            data.signature,
+        ])
+    }
+
     public encodeAMMTradeWithPath(data: AMMTradeWithPathData): string {
-        const i = new ethers.utils.Interface(abiAMMWrapperWithPath)
+        const i = new ethers.utils.Interface(abi.AMMWrapperWithPath)
         return i.encodeFunctionData("trade", [
             [
                 data.makerAddr,

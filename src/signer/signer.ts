@@ -2,10 +2,9 @@ import crypto from "crypto"
 import { BigNumber } from "ethers"
 import { _TypedDataEncoder } from "@ethersproject/hash"
 
-import { SignerNotConnectedError } from "../error"
 import {
     EIP712Domain,
-    EIP712Signer,
+    EIP712DomainOptions,
     EIP712Types,
     EIP712Value,
     SignatureType,
@@ -21,22 +20,9 @@ export class Signer {
     public name: string
     public version: string
 
-    private signer?: EIP712Signer
-
     public constructor(options: SignerOptions) {
         this.name = options.name
         this.version = options.version
-    }
-
-    public connect(signer: EIP712Signer): this {
-        const result: this = Reflect.construct(this.constructor, [
-            {
-                name: this.name,
-                version: this.version,
-            },
-        ])
-        result.signer = signer
-        return result
     }
 
     public generateRandomSalt(): BigNumber {
@@ -44,12 +30,12 @@ export class Signer {
         return BigNumber.from(randomBytes)
     }
 
-    public getEIP712Domain(chainId: number, verifyingContract: string): EIP712Domain {
+    public async getEIP712Domain(options: EIP712DomainOptions): Promise<EIP712Domain> {
         return {
             name: this.name,
             version: this.version,
-            chainId,
-            verifyingContract,
+            chainId: await options.signer.getChainId(),
+            verifyingContract: options.verifyingContract,
         }
     }
 
@@ -70,14 +56,8 @@ export class Signer {
         value: EIP712Value,
         options: SigningOptions,
     ): Promise<string> {
-        if (!this.signer) {
-            throw new SignerNotConnectedError("Singer is not connected")
-        }
-        const domain = this.getEIP712Domain(
-            await this.signer.getChainId(),
-            options.verifyingContract,
-        )
-        const signature = await this.signer._signTypedData(domain, types, value)
+        const domain = await this.getEIP712Domain(options)
+        const signature = await options.signer._signTypedData(domain, types, value)
         const signatureComposed = this.composeSignature(signature, options.type)
         return signatureComposed
     }
