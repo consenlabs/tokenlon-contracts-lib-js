@@ -7,6 +7,7 @@ export default {
 
     // Tokenlon
     AllowanceTarget: "0x413eCcE5d56204962090eEF1deaD4c0a247e289B",
+    AMMWrapper: "",
     AMMWrapperWithPath: "",
     LimitOrder: "0xdC842f306d05Fc0e3A2469976ab860B453Af2D1A",
     RFQ: "",

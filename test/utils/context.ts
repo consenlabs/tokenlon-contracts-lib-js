@@ -135,3 +135,4 @@ contextSuite.skip = function (title: string, suite: (ctx: Context) => void) {
 }
 
 __ctx__.then(() => setTimeout(run, 0))
+__ctx__.catch((e) => console.error(e))
