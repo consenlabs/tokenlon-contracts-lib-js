@@ -1,5 +1,5 @@
 import { EIP712DomainOptions, EIP712Types, Signer as BaseSigner, SigningOptions } from "../signer"
-import { AMMOrder, RFQMakerOrder, RFQTakerOrder } from "./types"
+import { AMMOrder, RFQOrder, RFQFill } from "./types"
 
 export class Signer extends BaseSigner {
     public constructor() {
@@ -44,9 +44,9 @@ export class Signer extends BaseSigner {
         return this.signEIP712(this.getAMMOrderEIP712Types(), order, options)
     }
 
-    /* RFQ - Maker Order */
+    /* RFQ - Order (for maker) */
 
-    public getRFQMakerOrderEIP712Types(): EIP712Types {
+    public getRFQOrderEIP712Types(): EIP712Types {
         return {
             Order: [
                 { name: "takerAddr", type: "address" },
@@ -62,26 +62,26 @@ export class Signer extends BaseSigner {
         }
     }
 
-    public async getRFQMakerOrderEIP712Digest(
-        order: RFQMakerOrder,
+    public async getRFQOrderEIP712Digest(
+        order: RFQOrder,
         options: EIP712DomainOptions,
     ): Promise<string> {
         const domain = await this.getEIP712Domain(options)
-        const types = this.getRFQMakerOrderEIP712Types()
+        const types = this.getRFQOrderEIP712Types()
         return this.getEIP712Digest(domain, types, order)
     }
 
-    public getRFQMakerOrderEIP712StructHash(order: RFQMakerOrder): string {
-        return this.getEIP712StructHash("Order", this.getRFQMakerOrderEIP712Types(), order)
+    public getRFQOrderEIP712StructHash(order: RFQOrder): string {
+        return this.getEIP712StructHash("Order", this.getRFQOrderEIP712Types(), order)
     }
 
-    public signRFQMakerOrder(order: RFQMakerOrder, options: SigningOptions): Promise<string> {
-        return this.signEIP712(this.getRFQMakerOrderEIP712Types(), order, options)
+    public signRFQOrder(order: RFQOrder, options: SigningOptions): Promise<string> {
+        return this.signEIP712(this.getRFQOrderEIP712Types(), order, options)
     }
 
-    /* RFQ - Taker Order */
+    /* RFQ - Fill (for taker) */
 
-    public getRFQTakerOrderEIP712Types(): EIP712Types {
+    public getRFQFillEIP712Types(): EIP712Types {
         return {
             fillWithPermit: [
                 { name: "makerAddr", type: "address" },
@@ -98,20 +98,20 @@ export class Signer extends BaseSigner {
         }
     }
 
-    public async getRFQTakerOrderEIP712Digest(
-        order: RFQTakerOrder,
+    public async getRFQFillEIP712Digest(
+        fill: RFQFill,
         options: EIP712DomainOptions,
     ): Promise<string> {
         const domain = await this.getEIP712Domain(options)
-        const types = this.getRFQTakerOrderEIP712Types()
-        return this.getEIP712Digest(domain, types, order)
+        const types = this.getRFQFillEIP712Types()
+        return this.getEIP712Digest(domain, types, fill)
     }
 
-    public getRFQTakerOrderEIP712StructHash(order: RFQTakerOrder): string {
-        return this.getEIP712StructHash("fillWithPermit", this.getRFQTakerOrderEIP712Types(), order)
+    public getRFQFillEIP712StructHash(order: RFQFill): string {
+        return this.getEIP712StructHash("fillWithPermit", this.getRFQFillEIP712Types(), order)
     }
 
-    public signRFQTakerOrder(order: RFQTakerOrder, options: SigningOptions): Promise<string> {
-        return this.signEIP712(this.getRFQTakerOrderEIP712Types(), order, options)
+    public signRFQFillOrder(fill: RFQFill, options: SigningOptions): Promise<string> {
+        return this.signEIP712(this.getRFQFillEIP712Types(), fill, options)
     }
 }

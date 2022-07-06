@@ -46,7 +46,7 @@ export type AMMTradeWithPathData = {
 
 /* RFQ */
 
-export type RFQMakerOrder = {
+export type RFQOrder = {
     takerAddr: string
     makerAddr: string
     takerAssetAddr: string
@@ -58,7 +58,7 @@ export type RFQMakerOrder = {
     feeFactor: number
 }
 
-export type RFQTakerOrder = RFQMakerOrder & {
+export type RFQFill = RFQOrder & {
     receiverAddr: string
 }
 
