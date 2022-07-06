@@ -11,7 +11,7 @@ import { contextSuite } from "@test/utils/context"
 import { deployERC1271Wallet, parseLogsByName } from "@test/utils/contract"
 
 if (isNetwork(Network.Mainnet)) {
-    contextSuite("AMMWrapper", ({ token, tokenlon, uniswap, wallet }) => {
+    contextSuite("AMMWrapper", ({ wallet, token, tokenlon, uniswap }) => {
         const defaultOrder: AMMOrder = {
             // Should fill following fields in each case
             makerAddr: "0x",

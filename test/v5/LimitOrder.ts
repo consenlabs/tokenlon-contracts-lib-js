@@ -21,7 +21,7 @@ import { contextSuite } from "@test/utils/context"
 import { deployERC1271Wallet, parseLogsByName } from "@test/utils/contract"
 
 if (isNetwork(Network.Arbitrum)) {
-    contextSuite("LimitOrder", ({ token, tokenlon, uniswap, sushiswap, wallet }) => {
+    contextSuite("LimitOrder", ({ wallet, token, tokenlon, uniswap, sushiswap }) => {
         const coordinator = Wallet.createRandom().connect(ethers.provider)
         const maker = Wallet.createRandom().connect(ethers.provider)
         const defaultOrder: LimitOrder = {
