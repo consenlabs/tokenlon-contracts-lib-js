@@ -1,18 +1,14 @@
 export enum Network {
-    Mainnet = "mainnet",
-    Arbitrum = "arbitrum",
+    Mainnet = 1,
+    Arbitrum = 42161,
 }
 
 const network = (() => {
-    const network = process.env.NETWORK
-    switch (network) {
-        case Network.Arbitrum:
-            return Network.Arbitrum
-        case Network.Mainnet:
-            return Network.Mainnet
-        default:
-            throw new Error(`Unknown network ${network}`)
+    const network = parseInt(process.env.CHAIN_ID ?? "0", 10)
+    if (!Network[network]) {
+        throw new Error(`Unknown network ${network}`)
     }
+    return network
 })()
 
 export function isNetwork(...networks: Network[]): boolean {
@@ -43,4 +39,4 @@ export type Address = {
     Curve3Pool: string
 }
 
-export const address = require(`./${network}.ts`).default as Address
+export const address = require(`./${Network[network].toLowerCase()}.ts`).default as Address
