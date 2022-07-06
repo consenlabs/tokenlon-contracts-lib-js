@@ -35,6 +35,9 @@ export type Address = {
     UniswapV3Quoter: string
     UniswapV3Router: string
 
+    // Sushiswap
+    SushiswapRouter: string
+
     // Curve
     Curve3Pool: string
 }

@@ -18,6 +18,9 @@ export default {
     UniswapV3Quoter: "0xb27308f9F90D607463bb33eA1BeBb41C27CE5AB6",
     UniswapV3Router: "0xE592427A0AEce92De3Edee1F18E0157C05861564",
 
+    // Sushiswap
+    SushiswapRouter: "0x1b02dA8Cb0d097eB8D57A175b88c7D8b47997506",
+
     // Curve
     Curve3Pool: "",
 }

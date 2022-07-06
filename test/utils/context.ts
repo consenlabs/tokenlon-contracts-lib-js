@@ -41,6 +41,9 @@ export type Context = {
         UniswapV3Quoter: IUniswapV3Quoter
         UniswapV3Router: IUniswapV3Router
     }
+    sushiswap: {
+        SushiswapRouter: IUniswapV2Router
+    }
     address: Address
     snapshot: Snapshot
 }
@@ -84,6 +87,12 @@ async function setupContext(): Promise<Context> {
             UniswapV3Router: await ethers.getContractAt(
                 "IUniswapV3Router",
                 address.UniswapV3Router,
+            ),
+        },
+        sushiswap: {
+            SushiswapRouter: await ethers.getContractAt(
+                "IUniswapV2Router",
+                address.SushiswapRouter,
             ),
         },
         address,
