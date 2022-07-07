@@ -5,6 +5,7 @@ import abi from "./abi"
 import {
     AMMTradeData,
     AMMTradeWithPathData,
+    LimitOrderCancelData,
     LimitOrderFillByProtocolData,
     LimitOrderFillByTraderData,
     RFQFillData,
@@ -117,6 +118,23 @@ export class Encoder {
                 data.protocol.expiry,
             ],
             [data.coordinatorSignature, data.allowFill.salt, data.allowFill.expiry],
+        ])
+    }
+
+    public encodeLimitOrderCancel(data: LimitOrderCancelData) {
+        const i = new ethers.utils.Interface(abi.LimitOrder)
+        return i.encodeFunctionData("cancelLimitOrder", [
+            [
+                data.order.makerToken,
+                data.order.takerToken,
+                data.order.makerTokenAmount,
+                data.order.takerTokenAmount,
+                data.order.maker,
+                data.order.taker,
+                data.order.salt,
+                data.order.expiry,
+            ],
+            data.makerCancelSignature,
         ])
     }
 

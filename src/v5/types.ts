@@ -121,6 +121,11 @@ export type LimitOrderFillByProtocolData = {
     coordinatorSignature: BytesLike
 }
 
+export type LimitOrderCancelData = {
+    order: LimitOrder
+    makerCancelSignature: BytesLike
+}
+
 /* RFQ */
 
 export type RFQOrder = {

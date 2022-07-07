@@ -501,5 +501,50 @@ if (isNetwork(Network.Arbitrum)) {
                 }
             }
         })
+
+        describe("cancelLimitOrder", () => {
+            it("Should sign and encode valid cancel order", async () => {
+                const order = {
+                    ...defaultOrder,
+                }
+
+                // maker should provide signature for order with 0 taker token amount to cancel
+                const makerCancelSignature = await signer.signLimitOrder(
+                    {
+                        ...order,
+                        takerTokenAmount: 0,
+                    },
+                    {
+                        type: SignatureType.EIP712,
+                        signer: maker,
+                        verifyingContract: tokenlon.LimitOrder.address,
+                    },
+                )
+
+                const payload = encoder.encodeLimitOrderCancel({
+                    order,
+                    makerCancelSignature: makerCancelSignature,
+                })
+                const tx = await tokenlon.UserProxy.connect(wallet.user).toLimitOrder(payload)
+                const receipt = await tx.wait()
+
+                await assertCancelled(receipt, order)
+            })
+
+            async function assertCancelled(receipt: ContractReceipt, order: LimitOrder) {
+                const [{ args }] = parseLogsByName(
+                    tokenlon.LimitOrder,
+                    "OrderCancelled",
+                    receipt.logs,
+                )
+                expect(args.orderHash).to.equal(
+                    await signer.getLimitOrderEIP712Digest(order, {
+                        signer: maker,
+                        verifyingContract: tokenlon.LimitOrder.address,
+                    }),
+                )
+                expect(args.maker).to.equal(order.maker)
+            }
+        })
     })
 }

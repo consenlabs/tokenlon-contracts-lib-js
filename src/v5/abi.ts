@@ -418,6 +418,67 @@ export default {
             stateMutability: "nonpayable",
             type: "function",
         },
+        /* cancelLimitOrder */
+        {
+            inputs: [
+                {
+                    components: [
+                        {
+                            internalType: "address",
+                            name: "makerToken",
+                            type: "address",
+                        },
+                        {
+                            internalType: "address",
+                            name: "takerToken",
+                            type: "address",
+                        },
+                        {
+                            internalType: "uint256",
+                            name: "makerTokenAmount",
+                            type: "uint256",
+                        },
+                        {
+                            internalType: "uint256",
+                            name: "takerTokenAmount",
+                            type: "uint256",
+                        },
+                        {
+                            internalType: "address",
+                            name: "maker",
+                            type: "address",
+                        },
+                        {
+                            internalType: "address",
+                            name: "taker",
+                            type: "address",
+                        },
+                        {
+                            internalType: "uint256",
+                            name: "salt",
+                            type: "uint256",
+                        },
+                        {
+                            internalType: "uint64",
+                            name: "expiry",
+                            type: "uint64",
+                        },
+                    ],
+                    internalType: "struct ILimitOrder.Order",
+                    name: "_order",
+                    type: "tuple",
+                },
+                {
+                    internalType: "bytes",
+                    name: "_cancelMakerSig",
+                    type: "bytes",
+                },
+            ],
+            name: "cancelLimitOrder",
+            outputs: [],
+            stateMutability: "nonpayable",
+            type: "function",
+        },
     ],
     RFQ: [
         /* fill */
