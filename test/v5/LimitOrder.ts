@@ -19,11 +19,14 @@ import { dealETH, dealTokenAndApprove } from "@test/utils/balance"
 import { EXPIRY } from "@test/utils/constant"
 import { contextSuite } from "@test/utils/context"
 import { deployERC1271Wallet, parseLogsByName } from "@test/utils/contract"
+import { ERC1271Wallet } from "@typechain"
 
 if (isNetwork(Network.Arbitrum)) {
     contextSuite("LimitOrder", ({ wallet, token, tokenlon, uniswap, sushiswap }) => {
         const coordinator = Wallet.createRandom().connect(ethers.provider)
         const maker = Wallet.createRandom().connect(ethers.provider)
+        let makerERC1271Wallet: ERC1271Wallet
+
         const defaultOrder: LimitOrder = {
             // Could override following fields at need in each case
             makerToken: token.WETH.address,
@@ -37,8 +40,34 @@ if (isNetwork(Network.Arbitrum)) {
         }
 
         before(async () => {
-            // Setup wallets' balance for gas
+            // Setup wallet balance for gas
             await dealETH(maker, ethers.utils.parseEther("100"))
+
+            // Setup maker ERC1271 wallet
+            makerERC1271Wallet = await deployERC1271Wallet(maker)
+
+            // Setup token balance and approval
+            await dealTokenAndApprove(
+                maker,
+                tokenlon.AllowanceTarget,
+                defaultOrder.makerToken,
+                defaultOrder.makerTokenAmount,
+            )
+            await dealTokenAndApprove(
+                maker,
+                tokenlon.AllowanceTarget,
+                defaultOrder.makerToken,
+                defaultOrder.makerTokenAmount,
+                {
+                    walletContract: makerERC1271Wallet,
+                },
+            )
+            await dealTokenAndApprove(
+                wallet.user,
+                tokenlon.AllowanceTarget,
+                defaultOrder.takerToken,
+                defaultOrder.takerTokenAmount,
+            )
 
             // Replace coordinator on chain
             const operator = await ethers.getSigner(await tokenlon.LimitOrder.operator())
@@ -62,19 +91,6 @@ if (isNetwork(Network.Arbitrum)) {
                 const order = {
                     ...defaultOrder,
                 }
-
-                await dealTokenAndApprove(
-                    maker,
-                    tokenlon.AllowanceTarget,
-                    order.makerToken,
-                    order.makerTokenAmount,
-                )
-                await dealTokenAndApprove(
-                    wallet.user,
-                    tokenlon.AllowanceTarget,
-                    order.takerToken,
-                    order.takerTokenAmount,
-                )
 
                 // maker
                 const orderHash = await signer.getLimitOrderEIP712Digest(order, {
@@ -131,28 +147,10 @@ if (isNetwork(Network.Arbitrum)) {
             })
 
             it("Should sign and encode valid order for ERC1271 wallet", async () => {
-                const makerERC1271Wallet = await deployERC1271Wallet(maker)
-
                 const order = {
                     ...defaultOrder,
                     maker: makerERC1271Wallet.address,
                 }
-
-                await dealTokenAndApprove(
-                    maker,
-                    tokenlon.AllowanceTarget,
-                    order.makerToken,
-                    order.makerTokenAmount,
-                    {
-                        walletContract: makerERC1271Wallet,
-                    },
-                )
-                await dealTokenAndApprove(
-                    wallet.user,
-                    tokenlon.AllowanceTarget,
-                    order.takerToken,
-                    order.takerTokenAmount,
-                )
 
                 // maker
                 const orderHash = await signer.getLimitOrderEIP712Digest(order, {
@@ -256,13 +254,6 @@ if (isNetwork(Network.Arbitrum)) {
                         path,
                     )
 
-                await dealTokenAndApprove(
-                    maker,
-                    tokenlon.AllowanceTarget,
-                    order.makerToken,
-                    order.makerTokenAmount,
-                )
-
                 // maker
                 const orderHash = await signer.getLimitOrderEIP712Digest(order, {
                     signer: maker,
@@ -325,13 +316,6 @@ if (isNetwork(Network.Arbitrum)) {
                     order.makerTokenAmount,
                 )
 
-                await dealTokenAndApprove(
-                    maker,
-                    tokenlon.AllowanceTarget,
-                    order.makerToken,
-                    order.makerTokenAmount,
-                )
-
                 // maker
                 const orderHash = await signer.getLimitOrderEIP712Digest(order, {
                     signer: maker,
@@ -381,8 +365,6 @@ if (isNetwork(Network.Arbitrum)) {
             })
 
             it("Should sign and encode valid Uniswap v3 order for ERC1271 wallet", async () => {
-                const makerERC1271Wallet = await deployERC1271Wallet(maker)
-
                 const order = {
                     ...defaultOrder,
                     maker: makerERC1271Wallet.address,
@@ -394,16 +376,6 @@ if (isNetwork(Network.Arbitrum)) {
                 order.takerTokenAmount = await uniswap.UniswapV3Quoter.callStatic.quoteExactInput(
                     uniswapV3Path,
                     order.makerTokenAmount,
-                )
-
-                await dealTokenAndApprove(
-                    maker,
-                    tokenlon.AllowanceTarget,
-                    order.makerToken,
-                    order.makerTokenAmount,
-                    {
-                        walletContract: makerERC1271Wallet,
-                    },
                 )
 
                 // maker
