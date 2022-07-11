@@ -162,7 +162,7 @@ export class Encoder {
 
     /* Vendor */
 
-    public encodePath(path: string[]) {
+    public encodeUniswapV2Path(path: string[]) {
         return ethers.utils.defaultAbiCoder.encode(["address[]"], [path])
     }
 

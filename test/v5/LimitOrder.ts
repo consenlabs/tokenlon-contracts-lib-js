@@ -275,7 +275,7 @@ if (isNetwork(Network.Arbitrum)) {
                 })
 
                 // protocol
-                const sushiswapPath = encoder.encodePath(path)
+                const sushiswapPath = encoder.encodeUniswapV2Path(path)
                 const protocol: LimitOrderProtocolData = {
                     protocol: LimitOrderProtocol.Sushiswap,
                     data: sushiswapPath,
