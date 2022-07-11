@@ -40,7 +40,7 @@ export type AMMTradeWithPathData = {
     deadline: number
     feeFactor: number
     signature: BytesLike
-    makerSpecificData: string
+    makerSpecificData: BytesLike
     path: string[]
 }
 
@@ -98,7 +98,7 @@ export enum LimitOrderProtocol {
 
 export type LimitOrderProtocolData = {
     protocol: LimitOrderProtocol
-    data: string
+    data: BytesLike
     profitRecipient: string
     takerTokenAmount: BigNumberish
     protocolOutMinimum: BigNumberish
