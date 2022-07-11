@@ -1,5 +1,7 @@
 import { BigNumberish, BytesLike } from "ethers"
 
+/* AMM */
+
 export type AMMOrder = {
     makerAddr: string
     takerAssetAddr: string
@@ -40,4 +42,37 @@ export type AMMTradeWithPathData = {
     signature: BytesLike
     makerSpecificData: string
     path: string[]
+}
+
+/* RFQ */
+
+export type RFQOrder = {
+    takerAddr: string
+    makerAddr: string
+    takerAssetAddr: string
+    makerAssetAddr: string
+    takerAssetAmount: BigNumberish
+    makerAssetAmount: BigNumberish
+    salt: BigNumberish
+    deadline: number
+    feeFactor: number
+}
+
+export type RFQFill = RFQOrder & {
+    receiverAddr: string
+}
+
+export type RFQFillData = {
+    takerAddr: string
+    makerAddr: string
+    takerAssetAddr: string
+    makerAssetAddr: string
+    takerAssetAmount: BigNumberish
+    makerAssetAmount: BigNumberish
+    receiverAddr: string
+    salt: BigNumberish
+    deadline: number
+    feeFactor: number
+    makerSignature: BytesLike
+    takerSignature: BytesLike
 }

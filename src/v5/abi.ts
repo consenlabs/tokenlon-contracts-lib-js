@@ -158,4 +158,87 @@ export default {
             type: "function",
         },
     ],
+    RFQ: [
+        {
+            inputs: [
+                {
+                    components: [
+                        {
+                            internalType: "address",
+                            name: "takerAddr",
+                            type: "address",
+                        },
+                        {
+                            internalType: "address",
+                            name: "makerAddr",
+                            type: "address",
+                        },
+                        {
+                            internalType: "address",
+                            name: "takerAssetAddr",
+                            type: "address",
+                        },
+                        {
+                            internalType: "address",
+                            name: "makerAssetAddr",
+                            type: "address",
+                        },
+                        {
+                            internalType: "uint256",
+                            name: "takerAssetAmount",
+                            type: "uint256",
+                        },
+                        {
+                            internalType: "uint256",
+                            name: "makerAssetAmount",
+                            type: "uint256",
+                        },
+                        {
+                            internalType: "address",
+                            name: "receiverAddr",
+                            type: "address",
+                        },
+                        {
+                            internalType: "uint256",
+                            name: "salt",
+                            type: "uint256",
+                        },
+                        {
+                            internalType: "uint256",
+                            name: "deadline",
+                            type: "uint256",
+                        },
+                        {
+                            internalType: "uint256",
+                            name: "feeFactor",
+                            type: "uint256",
+                        },
+                    ],
+                    internalType: "struct IRFQ.Order",
+                    name: "_order",
+                    type: "tuple",
+                },
+                {
+                    internalType: "bytes",
+                    name: "_mmSignature",
+                    type: "bytes",
+                },
+                {
+                    internalType: "bytes",
+                    name: "_userSignature",
+                    type: "bytes",
+                },
+            ],
+            name: "fill",
+            outputs: [
+                {
+                    internalType: "uint256",
+                    name: "",
+                    type: "uint256",
+                },
+            ],
+            stateMutability: "payable",
+            type: "function",
+        },
+    ],
 }

@@ -2,7 +2,7 @@ import { ethers } from "ethers"
 
 import { encodeUniswapV3Path } from "../uniswap"
 import abi from "./abi"
-import { AMMTradeData, AMMTradeWithPathData } from "./types"
+import { AMMTradeData, AMMTradeWithPathData, RFQFillData } from "./types"
 
 export class Encoder {
     /* AMM */
@@ -58,5 +58,27 @@ export class Encoder {
 
     public encodeAMMCurveData(version: number): string {
         return ethers.utils.defaultAbiCoder.encode(["uint8"], [version])
+    }
+
+    /* RFQ */
+
+    public encodeRFQFill(data: RFQFillData): string {
+        const i = new ethers.utils.Interface(abi.RFQ)
+        return i.encodeFunctionData("fill", [
+            [
+                data.takerAddr,
+                data.makerAddr,
+                data.takerAssetAddr,
+                data.makerAssetAddr,
+                data.takerAssetAmount,
+                data.makerAssetAmount,
+                data.receiverAddr,
+                data.salt,
+                data.deadline,
+                data.feeFactor,
+            ],
+            data.makerSignature,
+            data.takerSignature,
+        ])
     }
 }

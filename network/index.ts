@@ -11,6 +11,7 @@ export type Network = {
     AllowanceTarget: string
     AMMWrapper: string
     AMMWrapperWithPath: string
+    RFQ: string
     UserProxy: string
 
     // Uniswap

@@ -11,6 +11,7 @@ interface IAMMWrapperWithPath {
         uint16 feeFactor;
         uint16 subsidyFactor;
     }
+
     struct Order {
         address makerAddr;
         address takerAssetAddr;
@@ -22,6 +23,7 @@ interface IAMMWrapperWithPath {
         uint256 salt;
         uint256 deadline;
     }
+
     event Swapped(TxMetaData txMetaData, Order order);
     
     function trade(
