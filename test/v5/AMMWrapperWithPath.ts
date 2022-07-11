@@ -13,7 +13,7 @@ import { contextSuite } from "@test/utils/context"
 import { deployERC1271Wallet, parseLogsByName } from "@test/utils/contract"
 
 if (isNetwork(Network.Mainnet)) {
-    contextSuite("AMMWrapperWithPath", ({ wallet, address, token, tokenlon, uniswap }) => {
+    contextSuite("AMMWrapperWithPath", ({ wallet, addresses, token, tokenlon, uniswap }) => {
         const defaultOrder: AMMOrder = {
             // Should fill following fields in each case
             makerAddr: "0x",
@@ -189,7 +189,7 @@ if (isNetwork(Network.Mainnet)) {
         })
 
         it("Should sign and encode valid Curve v1 order", async () => {
-            const curve3pool = await ethers.getContractAt("ICurve", address.Curve3Pool)
+            const curve3pool = await ethers.getContractAt("ICurve", addresses.Curve3Pool)
             const path = [token.USDC.address, token.USDT.address]
             const order = {
                 ...defaultOrder,

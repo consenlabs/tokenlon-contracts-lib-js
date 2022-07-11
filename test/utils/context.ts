@@ -1,7 +1,7 @@
 import { Wallet } from "ethers"
 import { ethers } from "hardhat"
 
-import { Address, address } from "@network"
+import { Addresses, addresses } from "@network"
 import {
     IAllowanceTarget,
     IAMMWrapper,
@@ -44,7 +44,7 @@ export type Context = {
     sushiswap: {
         SushiswapRouter: IUniswapV2Router
     }
-    address: Address
+    addresses: Addresses
     snapshot: Snapshot
 }
 
@@ -56,46 +56,46 @@ async function setupContext(): Promise<Context> {
             user: Wallet.createRandom().connect(ethers.provider),
         },
         token: {
-            DAI: await ethers.getContractAt("IERC20", address.DAI),
-            USDC: await ethers.getContractAt("IERC20", address.USDC),
-            USDT: await ethers.getContractAt("IERC20", address.USDT),
-            WETH: await ethers.getContractAt("IERC20", address.WETH),
+            DAI: await ethers.getContractAt("IERC20", addresses.DAI),
+            USDC: await ethers.getContractAt("IERC20", addresses.USDC),
+            USDT: await ethers.getContractAt("IERC20", addresses.USDT),
+            WETH: await ethers.getContractAt("IERC20", addresses.WETH),
         },
         tokenlon: {
             AllowanceTarget: await ethers.getContractAt(
                 "IAllowanceTarget",
-                address.AllowanceTarget,
+                addresses.AllowanceTarget,
             ),
-            AMMWrapper: await ethers.getContractAt("IAMMWrapper", address.AMMWrapper),
+            AMMWrapper: await ethers.getContractAt("IAMMWrapper", addresses.AMMWrapper),
             AMMWrapperWithPath: await ethers.getContractAt(
                 "IAMMWrapperWithPath",
-                address.AMMWrapperWithPath,
+                addresses.AMMWrapperWithPath,
             ),
-            LimitOrder: await ethers.getContractAt("ILimitOrder", address.LimitOrder),
-            RFQ: await ethers.getContractAt("IRFQ", address.RFQ),
-            UserProxy: await ethers.getContractAt("IUserProxy", address.UserProxy),
+            LimitOrder: await ethers.getContractAt("ILimitOrder", addresses.LimitOrder),
+            RFQ: await ethers.getContractAt("IRFQ", addresses.RFQ),
+            UserProxy: await ethers.getContractAt("IUserProxy", addresses.UserProxy),
         },
         uniswap: {
             UniswapV2Router: await ethers.getContractAt(
                 "IUniswapV2Router",
-                address.UniswapV2Router,
+                addresses.UniswapV2Router,
             ),
             UniswapV3Quoter: await ethers.getContractAt(
                 "IUniswapV3Quoter",
-                address.UniswapV3Quoter,
+                addresses.UniswapV3Quoter,
             ),
             UniswapV3Router: await ethers.getContractAt(
                 "IUniswapV3Router",
-                address.UniswapV3Router,
+                addresses.UniswapV3Router,
             ),
         },
         sushiswap: {
             SushiswapRouter: await ethers.getContractAt(
                 "IUniswapV2Router",
-                address.SushiswapRouter,
+                addresses.SushiswapRouter,
             ),
         },
-        address,
+        addresses: addresses,
         snapshot: await Snapshot.take(),
     }
 }

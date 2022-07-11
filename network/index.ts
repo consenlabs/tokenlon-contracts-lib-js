@@ -15,7 +15,7 @@ export function isNetwork(...networks: Network[]): boolean {
     return networks.includes(network)
 }
 
-export type Address = {
+export type Addresses = {
     // Token
     DAI: string
     USDC: string
@@ -42,4 +42,4 @@ export type Address = {
     Curve3Pool: string
 }
 
-export const address = require(`./${Network[network].toLowerCase()}.ts`).default as Address
+export const addresses = require(`./${Network[network].toLowerCase()}.ts`).default as Addresses
