@@ -1,11 +1,12 @@
 import { Wallet } from "ethers"
 import { ethers } from "hardhat"
 
-import network, { Network } from "@network"
+import { Addresses, addresses } from "@network"
 import {
     IAllowanceTarget,
     IAMMWrapper,
     IAMMWrapperWithPath,
+    ILimitOrder,
     IRFQ,
     IUserProxy,
     IERC20,
@@ -31,6 +32,7 @@ export type Context = {
         AllowanceTarget: IAllowanceTarget
         AMMWrapper: IAMMWrapper
         AMMWrapperWithPath: IAMMWrapperWithPath
+        LimitOrder: ILimitOrder
         RFQ: IRFQ
         UserProxy: IUserProxy
     }
@@ -39,7 +41,10 @@ export type Context = {
         UniswapV3Quoter: IUniswapV3Quoter
         UniswapV3Router: IUniswapV3Router
     }
-    network: Network
+    sushiswap: {
+        SushiswapRouter: IUniswapV2Router
+    }
+    addresses: Addresses
     snapshot: Snapshot
 }
 
@@ -51,39 +56,46 @@ async function setupContext(): Promise<Context> {
             user: Wallet.createRandom().connect(ethers.provider),
         },
         token: {
-            DAI: await ethers.getContractAt("IERC20", network.DAI),
-            USDC: await ethers.getContractAt("IERC20", network.USDC),
-            USDT: await ethers.getContractAt("IERC20", network.USDT),
-            WETH: await ethers.getContractAt("IERC20", network.WETH),
+            DAI: await ethers.getContractAt("IERC20", addresses.DAI),
+            USDC: await ethers.getContractAt("IERC20", addresses.USDC),
+            USDT: await ethers.getContractAt("IERC20", addresses.USDT),
+            WETH: await ethers.getContractAt("IERC20", addresses.WETH),
         },
         tokenlon: {
             AllowanceTarget: await ethers.getContractAt(
                 "IAllowanceTarget",
-                network.AllowanceTarget,
+                addresses.AllowanceTarget,
             ),
-            AMMWrapper: await ethers.getContractAt("IAMMWrapper", network.AMMWrapper),
+            AMMWrapper: await ethers.getContractAt("IAMMWrapper", addresses.AMMWrapper),
             AMMWrapperWithPath: await ethers.getContractAt(
                 "IAMMWrapperWithPath",
-                network.AMMWrapperWithPath,
+                addresses.AMMWrapperWithPath,
             ),
-            RFQ: await ethers.getContractAt("IRFQ", network.RFQ),
-            UserProxy: await ethers.getContractAt("IUserProxy", network.UserProxy),
+            LimitOrder: await ethers.getContractAt("ILimitOrder", addresses.LimitOrder),
+            RFQ: await ethers.getContractAt("IRFQ", addresses.RFQ),
+            UserProxy: await ethers.getContractAt("IUserProxy", addresses.UserProxy),
         },
         uniswap: {
             UniswapV2Router: await ethers.getContractAt(
                 "IUniswapV2Router",
-                network.UniswapV2Router,
+                addresses.UniswapV2Router,
             ),
             UniswapV3Quoter: await ethers.getContractAt(
                 "IUniswapV3Quoter",
-                network.UniswapV3Quoter,
+                addresses.UniswapV3Quoter,
             ),
             UniswapV3Router: await ethers.getContractAt(
                 "IUniswapV3Router",
-                network.UniswapV3Router,
+                addresses.UniswapV3Router,
             ),
         },
-        network,
+        sushiswap: {
+            SushiswapRouter: await ethers.getContractAt(
+                "IUniswapV2Router",
+                addresses.SushiswapRouter,
+            ),
+        },
+        addresses: addresses,
         snapshot: await Snapshot.take(),
     }
 }
@@ -132,3 +144,4 @@ contextSuite.skip = function (title: string, suite: (ctx: Context) => void) {
 }
 
 __ctx__.then(() => setTimeout(run, 0))
+__ctx__.catch((e) => console.error(e))

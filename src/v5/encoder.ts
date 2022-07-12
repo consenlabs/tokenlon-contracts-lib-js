@@ -2,7 +2,14 @@ import { ethers } from "ethers"
 
 import { encodeUniswapV3Path } from "../uniswap"
 import abi from "./abi"
-import { AMMTradeData, AMMTradeWithPathData, RFQFillData } from "./types"
+import {
+    AMMTradeData,
+    AMMTradeWithPathData,
+    LimitOrderCancelData,
+    LimitOrderFillByProtocolData,
+    LimitOrderFillByTraderData,
+    RFQFillData,
+} from "./types"
 
 export class Encoder {
     /* AMM */
@@ -60,6 +67,77 @@ export class Encoder {
         return ethers.utils.defaultAbiCoder.encode(["uint8"], [version])
     }
 
+    /* Limit Order */
+
+    public encodeLimitOrderFillByTrader(data: LimitOrderFillByTraderData) {
+        const i = new ethers.utils.Interface(abi.LimitOrder)
+        return i.encodeFunctionData("fillLimitOrderByTrader", [
+            [
+                data.order.makerToken,
+                data.order.takerToken,
+                data.order.makerTokenAmount,
+                data.order.takerTokenAmount,
+                data.order.maker,
+                data.order.taker,
+                data.order.salt,
+                data.order.expiry,
+            ],
+            data.makerSignature,
+            [
+                data.fill.taker,
+                data.fill.recipient,
+                data.fill.takerTokenAmount,
+                data.fill.takerSalt,
+                data.fill.expiry,
+                data.takerSignature,
+            ],
+            [data.coordinatorSignature, data.allowFill.salt, data.allowFill.expiry],
+        ])
+    }
+
+    public encodeLimitOrderFillByProtocol(data: LimitOrderFillByProtocolData) {
+        const i = new ethers.utils.Interface(abi.LimitOrder)
+        return i.encodeFunctionData("fillLimitOrderByProtocol", [
+            [
+                data.order.makerToken,
+                data.order.takerToken,
+                data.order.makerTokenAmount,
+                data.order.takerTokenAmount,
+                data.order.maker,
+                data.order.taker,
+                data.order.salt,
+                data.order.expiry,
+            ],
+            data.makerSignature,
+            [
+                data.protocol.protocol,
+                data.protocol.data,
+                data.protocol.profitRecipient,
+                data.protocol.takerTokenAmount,
+                data.protocol.protocolOutMinimum,
+                data.protocol.expiry,
+            ],
+            [data.coordinatorSignature, data.allowFill.salt, data.allowFill.expiry],
+        ])
+    }
+
+    public encodeLimitOrderCancel(data: LimitOrderCancelData) {
+        const i = new ethers.utils.Interface(abi.LimitOrder)
+        return i.encodeFunctionData("cancelLimitOrder", [
+            [
+                data.order.makerToken,
+                data.order.takerToken,
+                data.order.makerTokenAmount,
+                data.order.takerTokenAmount,
+                data.order.maker,
+                data.order.taker,
+                data.order.salt,
+                data.order.expiry,
+            ],
+            data.makerCancelSignature,
+        ])
+    }
+
     /* RFQ */
 
     public encodeRFQFill(data: RFQFillData): string {
@@ -80,5 +158,15 @@ export class Encoder {
             data.makerSignature,
             data.takerSignature,
         ])
+    }
+
+    /* Vendor */
+
+    public encodeUniswapV2Path(path: string[]) {
+        return ethers.utils.defaultAbiCoder.encode(["address[]"], [path])
+    }
+
+    public encodeUniswapV3Path(path: string[], fees: number[]) {
+        return encodeUniswapV3Path(path, fees)
     }
 }

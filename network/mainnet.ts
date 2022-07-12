@@ -9,6 +9,7 @@ export default {
     AllowanceTarget: "0x8A42d311D282Bfcaa5133b2DE0a8bCDBECea3073",
     AMMWrapper: "0x4a14347083B80E5216cA31350a2D21702aC3650d",
     AMMWrapperWithPath: "0x4a14347083B80E5216cA31350a2D21702aC3650d",
+    LimitOrder: "",
     RFQ: "0xfD6C2d2499b1331101726A8AC68CCc9Da3fAB54F",
     UserProxy: "0x03f34bE1BF910116595dB1b11E9d1B2cA5D59659",
 
@@ -16,6 +17,9 @@ export default {
     UniswapV2Router: "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D",
     UniswapV3Quoter: "0xb27308f9F90D607463bb33eA1BeBb41C27CE5AB6",
     UniswapV3Router: "0xE592427A0AEce92De3Edee1F18E0157C05861564",
+
+    // Sushiswap
+    SushiswapRouter: "0xd9e1cE17f2641f24aE83637ab66a2cca9C378B9F",
 
     // Curve
     Curve3Pool: "0xbEbc44782C7dB0a1A60Cb6fe97d0b483032FF1C7",

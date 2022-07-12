@@ -12,11 +12,11 @@ const accounts = {
 module.exports = {
     networks: {
         hardhat: {
-            chainId: 1,
+            chainId: parseInt(process.env.CHAIN_ID ?? "0", 10),
             accounts,
             forking: {
-                url: process.env.FORK_NODE_RPC_URL,
-                blockNumber: parseInt(process.env.FORK_BLOCK_NUMBER!, 10),
+                url: process.env.FORK_NODE_RPC_URL ?? "",
+                blockNumber: parseInt(process.env.FORK_BLOCK_NUMBER ?? "0", 10),
             },
             allowUnlimitedContractSize: true,
         },
@@ -36,5 +36,6 @@ module.exports = {
     },
     mocha: {
         delay: true,
+        timeout: 40000,
     },
 }

@@ -1,5 +1,12 @@
 import { EIP712DomainOptions, EIP712Types, Signer as BaseSigner, SigningOptions } from "../signer"
-import { AMMOrder, RFQOrder, RFQFill } from "./types"
+import {
+    AMMOrder,
+    LimitOrder,
+    LimitOrderAllowFill,
+    LimitOrderFill,
+    RFQFill,
+    RFQOrder,
+} from "./types"
 
 export class Signer extends BaseSigner {
     public constructor() {
@@ -42,6 +49,110 @@ export class Signer extends BaseSigner {
 
     public signAMMOrder(order: AMMOrder, options: SigningOptions): Promise<string> {
         return this.signEIP712(this.getAMMOrderEIP712Types(), order, options)
+    }
+
+    /* Limit Order */
+
+    public getLimitOrderEIP712Types(): EIP712Types {
+        return {
+            Order: [
+                { name: "makerToken", type: "address" },
+                { name: "takerToken", type: "address" },
+                { name: "makerTokenAmount", type: "uint256" },
+                { name: "takerTokenAmount", type: "uint256" },
+                { name: "maker", type: "address" },
+                { name: "taker", type: "address" },
+                { name: "salt", type: "uint256" },
+                { name: "expiry", type: "uint64" },
+            ],
+        }
+    }
+
+    public async getLimitOrderEIP712Digest(
+        order: LimitOrder,
+        options: EIP712DomainOptions,
+    ): Promise<string> {
+        const domain = await this.getEIP712Domain(options)
+        const types = this.getLimitOrderEIP712Types()
+        return this.getEIP712Digest(domain, types, order)
+    }
+
+    public getLimitOrderEIP712StructHash(order: LimitOrder): string {
+        return this.getEIP712StructHash("Order", this.getLimitOrderEIP712Types(), order)
+    }
+
+    public signLimitOrder(order: LimitOrder, options: SigningOptions): Promise<string> {
+        return this.signEIP712(this.getLimitOrderEIP712Types(), order, options)
+    }
+
+    /* Limit Order - Fill */
+
+    public getLimitOrderFillEIP712Types(): EIP712Types {
+        return {
+            Fill: [
+                { name: "orderHash", type: "bytes32" },
+                { name: "taker", type: "address" },
+                { name: "recipient", type: "address" },
+                { name: "takerTokenAmount", type: "uint256" },
+                { name: "takerSalt", type: "uint256" },
+                { name: "expiry", type: "uint64" },
+            ],
+        }
+    }
+
+    public async getLimitOrderFillEIP712Digest(
+        fill: LimitOrderFill,
+        options: EIP712DomainOptions,
+    ): Promise<string> {
+        const domain = await this.getEIP712Domain(options)
+        const types = this.getLimitOrderFillEIP712Types()
+        return this.getEIP712Digest(domain, types, fill)
+    }
+
+    public getLimitOrderFillEIP712StructHash(fill: LimitOrderFill): string {
+        return this.getEIP712StructHash("Fill", this.getLimitOrderFillEIP712Types(), fill)
+    }
+
+    public signLimitOrderFill(fill: LimitOrderFill, options: SigningOptions): Promise<string> {
+        return this.signEIP712(this.getLimitOrderFillEIP712Types(), fill, options)
+    }
+
+    /* Limit Order - Allow Fill */
+
+    public getLimitOrderAllowFillEIP712Types(): EIP712Types {
+        return {
+            AllowFill: [
+                { name: "orderHash", type: "bytes32" },
+                { name: "executor", type: "address" },
+                { name: "fillAmount", type: "uint256" },
+                { name: "salt", type: "uint256" },
+                { name: "expiry", type: "uint64" },
+            ],
+        }
+    }
+
+    public async getLimitOrderAllowFillEIP712Digest(
+        allowFill: LimitOrderAllowFill,
+        options: EIP712DomainOptions,
+    ): Promise<string> {
+        const domain = await this.getEIP712Domain(options)
+        const types = this.getLimitOrderAllowFillEIP712Types()
+        return this.getEIP712Digest(domain, types, allowFill)
+    }
+
+    public getLimitOrderAllowFillEIP712StructHash(allowFill: LimitOrderAllowFill): string {
+        return this.getEIP712StructHash(
+            "AllowFill",
+            this.getLimitOrderAllowFillEIP712Types(),
+            allowFill,
+        )
+    }
+
+    public signLimitOrderAllowFill(
+        allowFill: LimitOrderAllowFill,
+        options: SigningOptions,
+    ): Promise<string> {
+        return this.signEIP712(this.getLimitOrderAllowFillEIP712Types(), allowFill, options)
     }
 
     /* RFQ - Order (for maker) */

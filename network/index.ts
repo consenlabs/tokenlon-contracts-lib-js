@@ -1,6 +1,21 @@
-const network = process.env.NETWORK
+export enum Network {
+    Mainnet = 1,
+    Arbitrum = 42161,
+}
 
-export type Network = {
+const network = (() => {
+    const network = parseInt(process.env.CHAIN_ID ?? "0", 10)
+    if (!Network[network]) {
+        throw new Error(`Unknown network ${network}`)
+    }
+    return network
+})()
+
+export function isNetwork(...networks: Network[]): boolean {
+    return networks.includes(network)
+}
+
+export type Addresses = {
     // Token
     DAI: string
     USDC: string
@@ -11,6 +26,7 @@ export type Network = {
     AllowanceTarget: string
     AMMWrapper: string
     AMMWrapperWithPath: string
+    LimitOrder: string
     RFQ: string
     UserProxy: string
 
@@ -19,8 +35,11 @@ export type Network = {
     UniswapV3Quoter: string
     UniswapV3Router: string
 
+    // Sushiswap
+    SushiswapRouter: string
+
     // Curve
     Curve3Pool: string
 }
 
-export default require(`./${network}.ts`).default as Network
+export const addresses = require(`./${Network[network].toLowerCase()}.ts`).default as Addresses
