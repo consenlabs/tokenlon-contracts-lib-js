@@ -16,7 +16,7 @@ Tokenlon `v5` library supports the following Tokenlon strategy contracts:
 
 > Please refer to library tests under [test/v5](https://github.com/consenlabs/tokenlon-contracts-lib-js/blob/main/test/v5/) for more concrete examples of interacting with specific strategy contract.
 
--   EIP712 signature from EOA wallet
+-   EOA
 
 ```typescript
 import { ethers } from "ethers"
