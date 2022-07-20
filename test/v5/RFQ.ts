@@ -3,8 +3,8 @@ import { ContractReceipt, Wallet } from "ethers"
 import { ethers } from "hardhat"
 
 import { Network, isNetwork } from "@network"
-import { RFQFill, RFQOrder, encoder, signer } from "@src/v5"
-import { SignatureType } from "@src/signer"
+import { RFQFill, RFQOrder, encodingHelper, singingHelper } from "@src/v5"
+import { SignatureType } from "@src/signing"
 
 import { dealETH, dealTokenAndApprove } from "@test/utils/balance"
 import { EXPIRY } from "@test/utils/constant"
@@ -26,7 +26,7 @@ if (isNetwork(Network.Mainnet)) {
             makerAssetAddr: token.DAI.address,
             takerAssetAmount: 1,
             makerAssetAmount: 1000,
-            salt: signer.generateRandomSalt(),
+            salt: singingHelper.generateRandomSalt(),
             deadline: EXPIRY,
             feeFactor: 0,
         }
@@ -48,7 +48,7 @@ if (isNetwork(Network.Mainnet)) {
             )
 
             // maker
-            const makerSignature = await signer.signRFQOrder(order, {
+            const makerSignature = await singingHelper.signRFQOrder(order, {
                 type: SignatureType.EIP712,
                 signer: maker,
                 verifyingContract: tokenlon.RFQ.address,
@@ -59,13 +59,13 @@ if (isNetwork(Network.Mainnet)) {
                 ...order,
                 receiverAddr: wallet.user.address,
             }
-            const takerSignature = await signer.signRFQFillOrder(fill, {
+            const takerSignature = await singingHelper.signRFQFillOrder(fill, {
                 type: SignatureType.EIP712,
                 signer: wallet.user,
                 verifyingContract: tokenlon.RFQ.address,
             })
 
-            const payload = encoder.encodeRFQFill({
+            const payload = encodingHelper.encodeRFQFill({
                 ...fill,
                 makerSignature,
                 takerSignature,
@@ -97,7 +97,7 @@ if (isNetwork(Network.Mainnet)) {
             )
 
             // maker
-            const makerSignature = await signer.signRFQOrder(order, {
+            const makerSignature = await singingHelper.signRFQOrder(order, {
                 type: SignatureType.WalletBytes32,
                 signer: maker,
                 verifyingContract: tokenlon.RFQ.address,
@@ -108,13 +108,13 @@ if (isNetwork(Network.Mainnet)) {
                 ...order,
                 receiverAddr: wallet.user.address,
             }
-            const takerSignature = await signer.signRFQFillOrder(fill, {
+            const takerSignature = await singingHelper.signRFQFillOrder(fill, {
                 type: SignatureType.EIP712,
                 signer: wallet.user,
                 verifyingContract: tokenlon.RFQ.address,
             })
 
-            const payload = encoder.encodeRFQFill({
+            const payload = encodingHelper.encodeRFQFill({
                 ...fill,
                 makerSignature,
                 takerSignature,
@@ -146,11 +146,11 @@ if (isNetwork(Network.Mainnet)) {
             )
 
             // maker
-            const makerOrderDigest = await signer.getRFQOrderEIP712Digest(order, {
+            const makerOrderDigest = await singingHelper.getRFQOrderEIP712Digest(order, {
                 signer: maker,
                 verifyingContract: tokenlon.RFQ.address,
             })
-            const makerSignature = signer.composeSignature(
+            const makerSignature = singingHelper.composeSignature(
                 await maker.signMessage(ethers.utils.arrayify(makerOrderDigest)),
                 SignatureType.WalletBytes32,
             )
@@ -160,13 +160,13 @@ if (isNetwork(Network.Mainnet)) {
                 ...order,
                 receiverAddr: wallet.user.address,
             }
-            const takerSignature = await signer.signRFQFillOrder(fill, {
+            const takerSignature = await singingHelper.signRFQFillOrder(fill, {
                 type: SignatureType.EIP712,
                 signer: wallet.user,
                 verifyingContract: tokenlon.RFQ.address,
             })
 
-            const payload = encoder.encodeRFQFill({
+            const payload = encodingHelper.encodeRFQFill({
                 ...fill,
                 makerSignature,
                 takerSignature,
@@ -184,8 +184,8 @@ if (isNetwork(Network.Mainnet)) {
 
             // Verify order
             expect(args.source).to.equal("RFQ v1")
-            expect(args.orderHash).to.equal(signer.getRFQOrderEIP712StructHash(fill))
-            expect(args.transactionHash).to.equal(signer.getRFQFillEIP712StructHash(fill))
+            expect(args.orderHash).to.equal(singingHelper.getRFQOrderEIP712StructHash(fill))
+            expect(args.transactionHash).to.equal(singingHelper.getRFQFillEIP712StructHash(fill))
             expect(args.makerAddr).to.equal(fill.makerAddr)
             expect(args.takerAssetAddr).to.equal(fill.takerAssetAddr)
             expect(args.makerAssetAddr).to.equal(fill.makerAssetAddr)

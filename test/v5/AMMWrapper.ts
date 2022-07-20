@@ -2,8 +2,8 @@ import { expect } from "chai"
 import { ContractReceipt } from "ethers"
 
 import { Network, isNetwork } from "@network"
-import { AMMOrder, encoder, signer } from "@src/v5"
-import { SignatureType } from "@src/signer"
+import { AMMOrder, encodingHelper, singingHelper } from "@src/v5"
+import { SignatureType } from "@src/signing"
 
 import { dealTokenAndApprove } from "@test/utils/balance"
 import { EXPIRY } from "@test/utils/constant"
@@ -22,7 +22,7 @@ if (isNetwork(Network.Mainnet)) {
             // Could override following fields at need in each case
             userAddr: wallet.user.address,
             receiverAddr: wallet.user.address,
-            salt: signer.generateRandomSalt(),
+            salt: singingHelper.generateRandomSalt(),
             deadline: EXPIRY,
         }
 
@@ -44,12 +44,12 @@ if (isNetwork(Network.Mainnet)) {
                 order.takerAssetAddr,
                 order.takerAssetAmount,
             )
-            const signature = await signer.signAMMOrder(order, {
+            const signature = await singingHelper.signAMMOrder(order, {
                 type: SignatureType.EIP712,
                 signer: wallet.user,
                 verifyingContract: tokenlon.AMMWrapper.address,
             })
-            const payload = encoder.encodeAMMTrade({
+            const payload = encodingHelper.encodeAMMTrade({
                 ...order,
                 feeFactor: 0,
                 signature,
@@ -84,12 +84,12 @@ if (isNetwork(Network.Mainnet)) {
                     walletContract: erc1271Wallet,
                 },
             )
-            const signature = await signer.signAMMOrder(order, {
+            const signature = await singingHelper.signAMMOrder(order, {
                 type: SignatureType.WalletBytes32,
                 signer: wallet.user,
                 verifyingContract: tokenlon.AMMWrapper.address,
             })
-            const payload = encoder.encodeAMMTrade({
+            const payload = encodingHelper.encodeAMMTrade({
                 ...order,
                 feeFactor: 0,
                 signature,
@@ -104,7 +104,7 @@ if (isNetwork(Network.Mainnet)) {
             const [{ args }] = parseLogsByName(tokenlon.AMMWrapper, "Swapped", receipt.logs)
 
             // Verify order
-            expect(args.transactionHash).to.equal(signer.getAMMOrderEIP712StructHash(order))
+            expect(args.transactionHash).to.equal(singingHelper.getAMMOrderEIP712StructHash(order))
             expect(args.makerAddr).to.equal(order.makerAddr)
             expect(args.takerAssetAddr).to.equal(order.takerAssetAddr)
             expect(args.makerAssetAddr).to.equal(order.makerAssetAddr)

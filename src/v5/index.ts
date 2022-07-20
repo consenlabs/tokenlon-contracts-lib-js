@@ -1,9 +1,9 @@
-import { Encoder } from "./encoder"
-import { Signer } from "./signer"
+import { EncodingHelper } from "./encoding"
+import { SigningHelper } from "./signing"
 
-export * from "./encoder"
-export * from "./signer"
+export * from "./encoding"
+export * from "./signing"
 export * from "./types"
 
-export const encoder = new Encoder()
-export const signer = new Signer()
+export const encodingHelper = new EncodingHelper()
+export const singingHelper = new SigningHelper()
