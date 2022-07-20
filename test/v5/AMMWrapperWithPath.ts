@@ -3,8 +3,7 @@ import { ContractReceipt } from "ethers"
 import { ethers } from "hardhat"
 
 import { Network, isNetwork } from "@network"
-import { AMMOrder, encodingHelper, singingHelper } from "@src/v5"
-import { SignatureType } from "@src/signing"
+import { AMMOrder, SignatureType, encodingHelper, singingHelper } from "@src/v5"
 import { UniswapV3Fee } from "@src/uniswap"
 
 import { dealTokenAndApprove } from "@test/utils/balance"

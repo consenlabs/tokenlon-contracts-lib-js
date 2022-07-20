@@ -3,8 +3,7 @@ import { ContractReceipt, Wallet } from "ethers"
 import { ethers } from "hardhat"
 
 import { Network, isNetwork } from "@network"
-import { RFQFill, RFQOrder, encodingHelper, singingHelper } from "@src/v5"
-import { SignatureType } from "@src/signing"
+import { RFQFill, RFQOrder, SignatureType, encodingHelper, singingHelper } from "@src/v5"
 
 import { dealETH, dealTokenAndApprove } from "@test/utils/balance"
 import { EXPIRY } from "@test/utils/constant"

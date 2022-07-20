@@ -9,10 +9,10 @@ import {
     LimitOrderFill,
     LimitOrderProtocol,
     LimitOrderProtocolData,
+    SignatureType,
     encodingHelper,
     singingHelper,
 } from "@src/v5"
-import { SignatureType } from "@src/signing"
 import { UniswapV3Fee } from "@src/uniswap"
 
 import { dealETH, dealTokenAndApprove } from "@test/utils/balance"
