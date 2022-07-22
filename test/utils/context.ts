@@ -44,7 +44,10 @@ export type Context = {
     sushiswap: {
         SushiswapRouter: IUniswapV2Router
     }
-    addresses: Addresses
+    network: {
+        addresses: Addresses
+        chainId: number
+    }
     snapshot: Snapshot
 }
 
@@ -95,7 +98,10 @@ async function setupContext(): Promise<Context> {
                 addresses.SushiswapRouter,
             ),
         },
-        addresses: addresses,
+        network: {
+            addresses: addresses,
+            chainId: (await ethers.provider.getNetwork()).chainId,
+        },
         snapshot: await Snapshot.take(),
     }
 }

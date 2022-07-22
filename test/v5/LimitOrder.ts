@@ -1,6 +1,6 @@
 import { expect } from "chai"
 import { ContractReceipt, Wallet } from "ethers"
-import { ethers, network } from "hardhat"
+import { ethers, network as hardhatNetwork } from "hardhat"
 
 import { Network, isNetwork } from "@network"
 import {
@@ -22,7 +22,7 @@ import { deployERC1271Wallet, parseLogsByName } from "@test/utils/contract"
 import { ERC1271Wallet } from "@typechain"
 
 if (isNetwork(Network.Arbitrum)) {
-    contextSuite("LimitOrder", ({ wallet, token, tokenlon, uniswap, sushiswap }) => {
+    contextSuite("LimitOrder", ({ wallet, network, token, tokenlon, uniswap, sushiswap }) => {
         const coordinator = Wallet.createRandom().connect(ethers.provider)
         const maker = Wallet.createRandom().connect(ethers.provider)
         let makerERC1271Wallet: ERC1271Wallet
@@ -74,13 +74,13 @@ if (isNetwork(Network.Arbitrum)) {
 
             await dealETH(operator, ethers.utils.parseEther("100"))
 
-            await network.provider.request({
+            await hardhatNetwork.provider.request({
                 method: "hardhat_impersonateAccount",
                 params: [await operator.getAddress()],
             })
             await tokenlon.LimitOrder.connect(operator).upgradeCoordinator(coordinator.address)
 
-            await network.provider.request({
+            await hardhatNetwork.provider.request({
                 method: "hardhat_stopImpersonatingAccount",
                 params: [await operator.getAddress()],
             })
@@ -94,7 +94,7 @@ if (isNetwork(Network.Arbitrum)) {
 
                 // maker
                 const orderHash = await signer.getLimitOrderEIP712Digest(order, {
-                    signer: maker,
+                    chainId: network.chainId,
                     verifyingContract: tokenlon.LimitOrder.address,
                 })
                 const makerSignature = await signer.signLimitOrder(order, {
@@ -154,7 +154,7 @@ if (isNetwork(Network.Arbitrum)) {
 
                 // maker
                 const orderHash = await signer.getLimitOrderEIP712Digest(order, {
-                    signer: maker,
+                    chainId: network.chainId,
                     verifyingContract: tokenlon.LimitOrder.address,
                 })
                 const makerSignature = await signer.signLimitOrder(order, {
@@ -219,7 +219,7 @@ if (isNetwork(Network.Arbitrum)) {
                 )
                 expect(args.orderHash).to.equal(
                     await signer.getLimitOrderEIP712Digest(order, {
-                        signer: maker,
+                        chainId: network.chainId,
                         verifyingContract: tokenlon.LimitOrder.address,
                     }),
                 )
@@ -227,7 +227,7 @@ if (isNetwork(Network.Arbitrum)) {
                 expect(args.taker).to.equal(fill.taker)
                 expect(args.allowFillHash).to.equal(
                     await signer.getLimitOrderAllowFillEIP712Digest(allowFill, {
-                        signer: coordinator,
+                        chainId: network.chainId,
                         verifyingContract: tokenlon.LimitOrder.address,
                     }),
                 )
@@ -256,7 +256,7 @@ if (isNetwork(Network.Arbitrum)) {
 
                 // maker
                 const orderHash = await signer.getLimitOrderEIP712Digest(order, {
-                    signer: maker,
+                    chainId: network.chainId,
                     verifyingContract: tokenlon.LimitOrder.address,
                 })
                 const makerSignature = await signer.signLimitOrder(order, {
@@ -318,7 +318,7 @@ if (isNetwork(Network.Arbitrum)) {
 
                 // maker
                 const orderHash = await signer.getLimitOrderEIP712Digest(order, {
-                    signer: maker,
+                    chainId: network.chainId,
                     verifyingContract: tokenlon.LimitOrder.address,
                 })
                 const makerSignature = await signer.signLimitOrder(order, {
@@ -380,7 +380,7 @@ if (isNetwork(Network.Arbitrum)) {
 
                 // maker
                 const orderHash = await signer.getLimitOrderEIP712Digest(order, {
-                    signer: maker,
+                    chainId: network.chainId,
                     verifyingContract: tokenlon.LimitOrder.address,
                 })
                 const makerSignature = await signer.signLimitOrder(order, {
@@ -439,7 +439,7 @@ if (isNetwork(Network.Arbitrum)) {
                 )
                 expect(args.orderHash).to.equal(
                     await signer.getLimitOrderEIP712Digest(order, {
-                        signer: maker,
+                        chainId: network.chainId,
                         verifyingContract: tokenlon.LimitOrder.address,
                     }),
                 )
@@ -447,7 +447,7 @@ if (isNetwork(Network.Arbitrum)) {
                 expect(args.taker).to.equal(getProtocolAddress(protocol.protocol))
                 expect(args.allowFillHash).to.equal(
                     await signer.getLimitOrderAllowFillEIP712Digest(allowFill, {
-                        signer: coordinator,
+                        chainId: network.chainId,
                         verifyingContract: tokenlon.LimitOrder.address,
                     }),
                 )
@@ -511,7 +511,7 @@ if (isNetwork(Network.Arbitrum)) {
                 )
                 expect(args.orderHash).to.equal(
                     await signer.getLimitOrderEIP712Digest(order, {
-                        signer: maker,
+                        chainId: network.chainId,
                         verifyingContract: tokenlon.LimitOrder.address,
                     }),
                 )

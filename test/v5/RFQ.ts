@@ -16,7 +16,7 @@ import {
 } from "@test/utils/contract"
 
 if (isNetwork(Network.Mainnet)) {
-    contextSuite("RFQ", ({ wallet, token, tokenlon }) => {
+    contextSuite("RFQ", ({ wallet, network, token, tokenlon }) => {
         const maker = Wallet.createRandom().connect(ethers.provider)
         const defaultOrder: RFQOrder = {
             // Could override following fields at need in each case
@@ -43,7 +43,7 @@ if (isNetwork(Network.Mainnet)) {
             await dealTokenAndApprove(
                 maker,
                 tokenlon.AllowanceTarget,
-                token.DAI,
+                order.makerAssetAddr,
                 order.makerAssetAmount,
             )
 
@@ -89,7 +89,7 @@ if (isNetwork(Network.Mainnet)) {
             await dealTokenAndApprove(
                 maker,
                 tokenlon.AllowanceTarget,
-                token.DAI,
+                order.makerAssetAddr,
                 order.makerAssetAmount,
                 {
                     walletContract: makerERC1271Wallet,
@@ -138,7 +138,7 @@ if (isNetwork(Network.Mainnet)) {
             await dealTokenAndApprove(
                 maker,
                 tokenlon.AllowanceTarget,
-                token.DAI,
+                order.makerAssetAddr,
                 order.makerAssetAmount,
                 {
                     walletContract: makerERC1271Wallet,
@@ -147,7 +147,7 @@ if (isNetwork(Network.Mainnet)) {
 
             // maker
             const makerOrderDigest = await signer.getRFQOrderEIP712Digest(order, {
-                signer: maker,
+                chainId: network.chainId,
                 verifyingContract: tokenlon.RFQ.address,
             })
             const makerSignature = signer.composeSignature(
