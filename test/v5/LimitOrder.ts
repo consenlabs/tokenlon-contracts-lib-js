@@ -11,7 +11,7 @@ import {
     LimitOrderProtocolData,
     SignatureType,
     encodingHelper,
-    singingHelper,
+    signingHelper,
 } from "@src/v5"
 import { UniswapV3Fee } from "@src/uniswap"
 
@@ -35,7 +35,7 @@ if (isNetwork(Network.Arbitrum)) {
             takerTokenAmount: 100 * 1000,
             maker: maker.address,
             taker: ethers.constants.AddressZero, // can be filled by anyone
-            salt: singingHelper.generateRandomSalt(),
+            salt: signingHelper.generateRandomSalt(),
             expiry: EXPIRY,
         }
 
@@ -93,11 +93,11 @@ if (isNetwork(Network.Arbitrum)) {
                 }
 
                 // maker
-                const orderHash = await singingHelper.getLimitOrderEIP712Digest(order, {
+                const orderHash = await signingHelper.getLimitOrderEIP712Digest(order, {
                     signer: maker,
                     verifyingContract: tokenlon.LimitOrder.address,
                 })
-                const makerSignature = await singingHelper.signLimitOrder(order, {
+                const makerSignature = await signingHelper.signLimitOrder(order, {
                     type: SignatureType.EIP712,
                     signer: maker,
                     verifyingContract: tokenlon.LimitOrder.address,
@@ -109,10 +109,10 @@ if (isNetwork(Network.Arbitrum)) {
                     taker: wallet.user.address,
                     recipient: wallet.user.address,
                     takerTokenAmount: order.takerTokenAmount,
-                    takerSalt: singingHelper.generateRandomSalt(),
+                    takerSalt: signingHelper.generateRandomSalt(),
                     expiry: EXPIRY,
                 }
-                const takerSignature = await singingHelper.signLimitOrderFill(fill, {
+                const takerSignature = await signingHelper.signLimitOrderFill(fill, {
                     type: SignatureType.EIP712,
                     signer: wallet.user,
                     verifyingContract: tokenlon.LimitOrder.address,
@@ -123,10 +123,10 @@ if (isNetwork(Network.Arbitrum)) {
                     orderHash,
                     executor: wallet.user.address,
                     fillAmount: order.takerTokenAmount,
-                    salt: singingHelper.generateRandomSalt(),
+                    salt: signingHelper.generateRandomSalt(),
                     expiry: EXPIRY,
                 }
-                const coordinatorSignature = await singingHelper.signLimitOrderAllowFill(
+                const coordinatorSignature = await signingHelper.signLimitOrderAllowFill(
                     allowFill,
                     {
                         type: SignatureType.EIP712,
@@ -156,11 +156,11 @@ if (isNetwork(Network.Arbitrum)) {
                 }
 
                 // maker
-                const orderHash = await singingHelper.getLimitOrderEIP712Digest(order, {
+                const orderHash = await signingHelper.getLimitOrderEIP712Digest(order, {
                     signer: maker,
                     verifyingContract: tokenlon.LimitOrder.address,
                 })
-                const makerSignature = await singingHelper.signLimitOrder(order, {
+                const makerSignature = await signingHelper.signLimitOrder(order, {
                     type: SignatureType.WalletBytes32,
                     signer: maker,
                     verifyingContract: tokenlon.LimitOrder.address,
@@ -172,10 +172,10 @@ if (isNetwork(Network.Arbitrum)) {
                     taker: wallet.user.address,
                     recipient: wallet.user.address,
                     takerTokenAmount: order.takerTokenAmount,
-                    takerSalt: singingHelper.generateRandomSalt(),
+                    takerSalt: signingHelper.generateRandomSalt(),
                     expiry: EXPIRY,
                 }
-                const takerSignature = await singingHelper.signLimitOrderFill(fill, {
+                const takerSignature = await signingHelper.signLimitOrderFill(fill, {
                     type: SignatureType.EIP712,
                     signer: wallet.user,
                     verifyingContract: tokenlon.LimitOrder.address,
@@ -186,10 +186,10 @@ if (isNetwork(Network.Arbitrum)) {
                     orderHash,
                     executor: wallet.user.address,
                     fillAmount: order.takerTokenAmount,
-                    salt: singingHelper.generateRandomSalt(),
+                    salt: signingHelper.generateRandomSalt(),
                     expiry: EXPIRY,
                 }
-                const coordinatorSignature = await singingHelper.signLimitOrderAllowFill(
+                const coordinatorSignature = await signingHelper.signLimitOrderAllowFill(
                     allowFill,
                     {
                         type: SignatureType.EIP712,
@@ -224,7 +224,7 @@ if (isNetwork(Network.Arbitrum)) {
                     receipt.logs,
                 )
                 expect(args.orderHash).to.equal(
-                    await singingHelper.getLimitOrderEIP712Digest(order, {
+                    await signingHelper.getLimitOrderEIP712Digest(order, {
                         signer: maker,
                         verifyingContract: tokenlon.LimitOrder.address,
                     }),
@@ -232,7 +232,7 @@ if (isNetwork(Network.Arbitrum)) {
                 expect(args.maker).to.equal(order.maker)
                 expect(args.taker).to.equal(fill.taker)
                 expect(args.allowFillHash).to.equal(
-                    await singingHelper.getLimitOrderAllowFillEIP712Digest(allowFill, {
+                    await signingHelper.getLimitOrderAllowFillEIP712Digest(allowFill, {
                         signer: coordinator,
                         verifyingContract: tokenlon.LimitOrder.address,
                     }),
@@ -261,11 +261,11 @@ if (isNetwork(Network.Arbitrum)) {
                     )
 
                 // maker
-                const orderHash = await singingHelper.getLimitOrderEIP712Digest(order, {
+                const orderHash = await signingHelper.getLimitOrderEIP712Digest(order, {
                     signer: maker,
                     verifyingContract: tokenlon.LimitOrder.address,
                 })
-                const makerSignature = await singingHelper.signLimitOrder(order, {
+                const makerSignature = await signingHelper.signLimitOrder(order, {
                     type: SignatureType.EIP712,
                     signer: maker,
                     verifyingContract: tokenlon.LimitOrder.address,
@@ -287,10 +287,10 @@ if (isNetwork(Network.Arbitrum)) {
                     orderHash,
                     executor: wallet.user.address,
                     fillAmount: order.takerTokenAmount,
-                    salt: singingHelper.generateRandomSalt(),
+                    salt: signingHelper.generateRandomSalt(),
                     expiry: EXPIRY,
                 }
-                const coordinatorSignature = await singingHelper.signLimitOrderAllowFill(
+                const coordinatorSignature = await signingHelper.signLimitOrderAllowFill(
                     allowFill,
                     {
                         type: SignatureType.EIP712,
@@ -326,11 +326,11 @@ if (isNetwork(Network.Arbitrum)) {
                 )
 
                 // maker
-                const orderHash = await singingHelper.getLimitOrderEIP712Digest(order, {
+                const orderHash = await signingHelper.getLimitOrderEIP712Digest(order, {
                     signer: maker,
                     verifyingContract: tokenlon.LimitOrder.address,
                 })
-                const makerSignature = await singingHelper.signLimitOrder(order, {
+                const makerSignature = await signingHelper.signLimitOrder(order, {
                     type: SignatureType.EIP712,
                     signer: maker,
                     verifyingContract: tokenlon.LimitOrder.address,
@@ -351,10 +351,10 @@ if (isNetwork(Network.Arbitrum)) {
                     orderHash,
                     executor: wallet.user.address,
                     fillAmount: order.takerTokenAmount,
-                    salt: singingHelper.generateRandomSalt(),
+                    salt: signingHelper.generateRandomSalt(),
                     expiry: EXPIRY,
                 }
-                const coordinatorSignature = await singingHelper.signLimitOrderAllowFill(
+                const coordinatorSignature = await signingHelper.signLimitOrderAllowFill(
                     allowFill,
                     {
                         type: SignatureType.EIP712,
@@ -391,11 +391,11 @@ if (isNetwork(Network.Arbitrum)) {
                 )
 
                 // maker
-                const orderHash = await singingHelper.getLimitOrderEIP712Digest(order, {
+                const orderHash = await signingHelper.getLimitOrderEIP712Digest(order, {
                     signer: maker,
                     verifyingContract: tokenlon.LimitOrder.address,
                 })
-                const makerSignature = await singingHelper.signLimitOrder(order, {
+                const makerSignature = await signingHelper.signLimitOrder(order, {
                     type: SignatureType.WalletBytes32,
                     signer: maker,
                     verifyingContract: tokenlon.LimitOrder.address,
@@ -416,10 +416,10 @@ if (isNetwork(Network.Arbitrum)) {
                     orderHash,
                     executor: wallet.user.address,
                     fillAmount: order.takerTokenAmount,
-                    salt: singingHelper.generateRandomSalt(),
+                    salt: signingHelper.generateRandomSalt(),
                     expiry: EXPIRY,
                 }
-                const coordinatorSignature = await singingHelper.signLimitOrderAllowFill(
+                const coordinatorSignature = await signingHelper.signLimitOrderAllowFill(
                     allowFill,
                     {
                         type: SignatureType.EIP712,
@@ -453,7 +453,7 @@ if (isNetwork(Network.Arbitrum)) {
                     receipt.logs,
                 )
                 expect(args.orderHash).to.equal(
-                    await singingHelper.getLimitOrderEIP712Digest(order, {
+                    await signingHelper.getLimitOrderEIP712Digest(order, {
                         signer: maker,
                         verifyingContract: tokenlon.LimitOrder.address,
                     }),
@@ -461,7 +461,7 @@ if (isNetwork(Network.Arbitrum)) {
                 expect(args.maker).to.equal(order.maker)
                 expect(args.taker).to.equal(getProtocolAddress(protocol.protocol))
                 expect(args.allowFillHash).to.equal(
-                    await singingHelper.getLimitOrderAllowFillEIP712Digest(allowFill, {
+                    await signingHelper.getLimitOrderAllowFillEIP712Digest(allowFill, {
                         signer: coordinator,
                         verifyingContract: tokenlon.LimitOrder.address,
                     }),
@@ -496,7 +496,7 @@ if (isNetwork(Network.Arbitrum)) {
                 }
 
                 // maker should provide signature for order with 0 taker token amount to cancel
-                const makerCancelSignature = await singingHelper.signLimitOrder(
+                const makerCancelSignature = await signingHelper.signLimitOrder(
                     {
                         ...order,
                         takerTokenAmount: 0,
@@ -525,7 +525,7 @@ if (isNetwork(Network.Arbitrum)) {
                     receipt.logs,
                 )
                 expect(args.orderHash).to.equal(
-                    await singingHelper.getLimitOrderEIP712Digest(order, {
+                    await signingHelper.getLimitOrderEIP712Digest(order, {
                         signer: maker,
                         verifyingContract: tokenlon.LimitOrder.address,
                     }),

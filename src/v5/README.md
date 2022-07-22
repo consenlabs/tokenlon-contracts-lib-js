@@ -134,10 +134,10 @@ enum SignatureType {
 }
 ```
 
-Each singing function on signing helper has the following required options: ([source](https://github.com/consenlabs/tokenlon-contracts-lib-js/blob/main/src/signer/types.ts#L9-L11))
+Each signing function on signing helper has the following required options: ([source](https://github.com/consenlabs/tokenlon-contracts-lib-js/blob/main/src/signer/types.ts#L9-L11))
 
 ```typescript
-type SingingOptions = {
+type SigningOptions = {
     type: SignatureType
 
     // A signer implements `EIP712Signer` interface

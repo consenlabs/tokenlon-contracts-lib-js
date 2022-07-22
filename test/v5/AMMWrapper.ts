@@ -2,7 +2,7 @@ import { expect } from "chai"
 import { ContractReceipt } from "ethers"
 
 import { Network, isNetwork } from "@network"
-import { AMMOrder, SignatureType, encodingHelper, singingHelper } from "@src/v5"
+import { AMMOrder, SignatureType, encodingHelper, signingHelper } from "@src/v5"
 
 import { dealTokenAndApprove } from "@test/utils/balance"
 import { EXPIRY } from "@test/utils/constant"
@@ -21,7 +21,7 @@ if (isNetwork(Network.Mainnet)) {
             // Could override following fields at need in each case
             userAddr: wallet.user.address,
             receiverAddr: wallet.user.address,
-            salt: singingHelper.generateRandomSalt(),
+            salt: signingHelper.generateRandomSalt(),
             deadline: EXPIRY,
         }
 
@@ -43,7 +43,7 @@ if (isNetwork(Network.Mainnet)) {
                 order.takerAssetAddr,
                 order.takerAssetAmount,
             )
-            const signature = await singingHelper.signAMMOrder(order, {
+            const signature = await signingHelper.signAMMOrder(order, {
                 type: SignatureType.EIP712,
                 signer: wallet.user,
                 verifyingContract: tokenlon.AMMWrapper.address,
@@ -83,7 +83,7 @@ if (isNetwork(Network.Mainnet)) {
                     walletContract: erc1271Wallet,
                 },
             )
-            const signature = await singingHelper.signAMMOrder(order, {
+            const signature = await signingHelper.signAMMOrder(order, {
                 type: SignatureType.WalletBytes32,
                 signer: wallet.user,
                 verifyingContract: tokenlon.AMMWrapper.address,
@@ -103,7 +103,7 @@ if (isNetwork(Network.Mainnet)) {
             const [{ args }] = parseLogsByName(tokenlon.AMMWrapper, "Swapped", receipt.logs)
 
             // Verify order
-            expect(args.transactionHash).to.equal(singingHelper.getAMMOrderEIP712StructHash(order))
+            expect(args.transactionHash).to.equal(signingHelper.getAMMOrderEIP712StructHash(order))
             expect(args.makerAddr).to.equal(order.makerAddr)
             expect(args.takerAssetAddr).to.equal(order.takerAssetAddr)
             expect(args.makerAssetAddr).to.equal(order.makerAssetAddr)
