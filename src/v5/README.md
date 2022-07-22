@@ -83,7 +83,7 @@ declare const userERC1271Wallet: ethers.Contract
 declare const order: AMMOrder
 
 const digest = await signer.getAMMOrderEIP712Digest(order, {
-    signer: user,
+    chainId: await user.getChainId(),
     verifyingContract: "0x4a14347083B80E5216cA31350a2D21702aC3650d", // Address of AMMWrapperWithPath
 })
 const digestSigned = await user.signMessage(ethers.utils.arrayify(digest))
