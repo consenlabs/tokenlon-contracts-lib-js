@@ -1,9 +1,12 @@
-import { Encoder } from "./encoder"
-import { Signer } from "./signer"
+import { EncodingHelper } from "./encoding"
+import { SigningHelper } from "./signing"
 
-export * from "./encoder"
-export * from "./signer"
+// Export common signing types for client's convenience
+export * from "@src/signing/types"
+
+export * from "./encoding"
+export * from "./signing"
 export * from "./types"
 
-export const encoder = new Encoder()
-export const signer = new Signer()
+export const encodingHelper = new EncodingHelper()
+export const signingHelper = new SigningHelper()

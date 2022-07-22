@@ -1,6 +1,6 @@
 import { ethers } from "ethers"
 
-import { encodeUniswapV3Path } from "../uniswap"
+import { encodeUniswapV3Path } from "@src/uniswap"
 import abi from "./abi"
 import {
     AMMTradeData,
@@ -11,7 +11,7 @@ import {
     RFQFillData,
 } from "./types"
 
-export class Encoder {
+export class EncodingHelper {
     /* AMM */
 
     public encodeAMMTrade(data: AMMTradeData): string {
