@@ -3,8 +3,7 @@ import { ContractReceipt } from "ethers"
 import { ethers } from "hardhat"
 
 import { Network, isNetwork } from "@network"
-import { AMMOrder, encoder, signer } from "@src/v5"
-import { SignatureType } from "@src/signer"
+import { AMMOrder, SignatureType, encodingHelper, signingHelper } from "@src/v5"
 import { UniswapV3Fee } from "@src/uniswap"
 
 import { dealTokenAndApprove } from "@test/utils/balance"
@@ -24,7 +23,7 @@ if (isNetwork(Network.Mainnet)) {
             // Could override following fields at need in each case
             userAddr: wallet.user.address,
             receiverAddr: wallet.user.address,
-            salt: signer.generateRandomSalt(),
+            salt: signingHelper.generateRandomSalt(),
             deadline: EXPIRY,
         }
 
@@ -47,12 +46,12 @@ if (isNetwork(Network.Mainnet)) {
                 order.takerAssetAddr,
                 order.takerAssetAmount,
             )
-            const signature = await signer.signAMMOrder(order, {
+            const signature = await signingHelper.signAMMOrder(order, {
                 type: SignatureType.EIP712,
                 signer: wallet.user,
                 verifyingContract: tokenlon.AMMWrapperWithPath.address,
             })
-            const payload = encoder.encodeAMMTradeWithPath({
+            const payload = encodingHelper.encodeAMMTradeWithPath({
                 ...order,
                 feeFactor: 0,
                 signature,
@@ -90,12 +89,12 @@ if (isNetwork(Network.Mainnet)) {
                     walletContract: erc1271Wallet,
                 },
             )
-            const signature = await signer.signAMMOrder(order, {
+            const signature = await signingHelper.signAMMOrder(order, {
                 type: SignatureType.WalletBytes32,
                 signer: wallet.user,
                 verifyingContract: tokenlon.AMMWrapperWithPath.address,
             })
-            const payload = encoder.encodeAMMTradeWithPath({
+            const payload = encodingHelper.encodeAMMTradeWithPath({
                 ...order,
                 feeFactor: 0,
                 signature,
@@ -130,13 +129,15 @@ if (isNetwork(Network.Mainnet)) {
                 order.takerAssetAddr,
                 order.takerAssetAmount,
             )
-            const signature = await signer.signAMMOrder(order, {
+            const signature = await signingHelper.signAMMOrder(order, {
                 type: SignatureType.EIP712,
                 signer: wallet.user,
                 verifyingContract: tokenlon.AMMWrapperWithPath.address,
             })
-            const makerSpecificData = encoder.encodeAMMUniswapV3SingleHopData(UniswapV3Fee.LOW)
-            const payload = encoder.encodeAMMTradeWithPath({
+            const makerSpecificData = encodingHelper.encodeAMMUniswapV3SingleHopData(
+                UniswapV3Fee.LOW,
+            )
+            const payload = encodingHelper.encodeAMMTradeWithPath({
                 ...order,
                 feeFactor: 0,
                 signature,
@@ -160,7 +161,7 @@ if (isNetwork(Network.Mainnet)) {
                 takerAssetAmount: 100,
             }
             order.makerAssetAmount = await uniswap.UniswapV3Quoter.callStatic.quoteExactInput(
-                encoder.encodeUniswapV3Path(path, fees),
+                encodingHelper.encodeUniswapV3Path(path, fees),
                 order.takerAssetAmount,
             )
             await dealTokenAndApprove(
@@ -169,13 +170,13 @@ if (isNetwork(Network.Mainnet)) {
                 order.takerAssetAddr,
                 order.takerAssetAmount,
             )
-            const signature = await signer.signAMMOrder(order, {
+            const signature = await signingHelper.signAMMOrder(order, {
                 type: SignatureType.EIP712,
                 signer: wallet.user,
                 verifyingContract: tokenlon.AMMWrapperWithPath.address,
             })
-            const makerSpecificData = encoder.encodeAMMUniswapV3MultiHopsData(path, fees)
-            const payload = encoder.encodeAMMTradeWithPath({
+            const makerSpecificData = encodingHelper.encodeAMMUniswapV3MultiHopsData(path, fees)
+            const payload = encodingHelper.encodeAMMTradeWithPath({
                 ...order,
                 feeFactor: 0,
                 signature,
@@ -211,13 +212,13 @@ if (isNetwork(Network.Mainnet)) {
                 order.takerAssetAddr,
                 order.takerAssetAmount,
             )
-            const signature = await signer.signAMMOrder(order, {
+            const signature = await signingHelper.signAMMOrder(order, {
                 type: SignatureType.EIP712,
                 signer: wallet.user,
                 verifyingContract: tokenlon.AMMWrapperWithPath.address,
             })
-            const makerSpecificData = encoder.encodeAMMCurveData(1)
-            const payload = encoder.encodeAMMTradeWithPath({
+            const makerSpecificData = encodingHelper.encodeAMMCurveData(1)
+            const payload = encodingHelper.encodeAMMTradeWithPath({
                 ...order,
                 feeFactor: 0,
                 signature,

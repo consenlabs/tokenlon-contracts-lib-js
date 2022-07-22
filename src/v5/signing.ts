@@ -1,4 +1,9 @@
-import { EIP712DomainOptions, EIP712Types, Signer as BaseSigner, SigningOptions } from "../signer"
+import {
+    EIP712DomainOptions,
+    EIP712Types,
+    SigningHelper as BaseSigningHelper,
+    SigningOptions,
+} from "@src/signing"
 import {
     AMMOrder,
     LimitOrder,
@@ -8,7 +13,7 @@ import {
     RFQOrder,
 } from "./types"
 
-export class Signer extends BaseSigner {
+export class SigningHelper extends BaseSigningHelper {
     public constructor() {
         super({
             name: "Tokenlon",

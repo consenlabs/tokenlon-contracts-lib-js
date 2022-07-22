@@ -11,16 +11,16 @@ import {
     SigningOptions,
 } from "./types"
 
-export type SignerOptions = {
+export type SigningHelperOptions = {
     name: string
     version: string
 }
 
-export class Signer {
+export class SigningHelper {
     public name: string
     public version: string
 
-    public constructor(options: SignerOptions) {
+    public constructor(options: SigningHelperOptions) {
         this.name = options.name
         this.version = options.version
     }
