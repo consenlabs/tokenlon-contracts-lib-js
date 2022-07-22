@@ -1,6 +1,10 @@
 import { expect } from "chai"
 import { ContractReceipt, Wallet } from "ethers"
-import { ethers, network as hardhatNetwork } from "hardhat"
+import { ethers } from "hardhat"
+import {
+    impersonateAccount,
+    stopImpersonatingAccount,
+} from "@nomicfoundation/hardhat-network-helpers"
 
 import { Network, isNetwork } from "@network"
 import {
@@ -74,16 +78,9 @@ if (isNetwork(Network.Arbitrum)) {
 
             await dealETH(operator, ethers.utils.parseEther("100"))
 
-            await hardhatNetwork.provider.request({
-                method: "hardhat_impersonateAccount",
-                params: [await operator.getAddress()],
-            })
+            await impersonateAccount(await operator.getAddress())
             await tokenlon.LimitOrder.connect(operator).upgradeCoordinator(coordinator.address)
-
-            await hardhatNetwork.provider.request({
-                method: "hardhat_stopImpersonatingAccount",
-                params: [await operator.getAddress()],
-            })
+            await stopImpersonatingAccount(await operator.getAddress())
         })
 
         describe("fillLimitOrderByTrader", () => {

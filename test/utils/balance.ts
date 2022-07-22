@@ -7,16 +7,13 @@ import {
     Signer,
 } from "ethers"
 import { ethers } from "hardhat"
+import { setBalance } from "@nomicfoundation/hardhat-network-helpers"
 
 import { Addressable, getAddress } from "./address"
 import { BytesConvertible, toBytes32 } from "./bytes"
 
 export async function dealETH(target: Addressable, amount: BigNumberish) {
-    const [operator] = await ethers.getSigners()
-    await operator.sendTransaction({
-        to: await getAddress(target),
-        value: amount,
-    })
+    await setBalance(await getAddress(target), BigNumber.from(amount))
 }
 
 export async function dealToken(target: Addressable, token: Addressable, amount: BigNumberish) {
