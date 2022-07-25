@@ -22,14 +22,20 @@ import { UniswapV3Fee } from "@src/uniswap"
 import { dealETH, dealTokenAndApprove } from "@test/utils/balance"
 import { EXPIRY } from "@test/utils/constant"
 import { contextSuite } from "@test/utils/context"
-import { deployERC1271Wallet, parseLogsByName } from "@test/utils/contract"
+import {
+    deployERC1271Wallet,
+    deployERC1271WalletETHSign,
+    parseLogsByName,
+} from "@test/utils/contract"
 import { ERC1271Wallet } from "@typechain"
 
 if (isNetwork(Network.Arbitrum)) {
     contextSuite("LimitOrder", ({ wallet, network, token, tokenlon, uniswap, sushiswap }) => {
         const coordinator = Wallet.createRandom().connect(ethers.provider)
         const maker = Wallet.createRandom().connect(ethers.provider)
+
         let makerERC1271Wallet: ERC1271Wallet
+        let makerERC1271WalletETHSign: ERC1271Wallet
 
         const defaultOrder: LimitOrder = {
             // Could override following fields at need in each case
@@ -49,6 +55,7 @@ if (isNetwork(Network.Arbitrum)) {
 
             // Setup maker ERC1271 wallet
             makerERC1271Wallet = await deployERC1271Wallet(maker)
+            makerERC1271WalletETHSign = await deployERC1271WalletETHSign(maker)
 
             // Setup token balance and approval
             await dealTokenAndApprove(
@@ -64,6 +71,15 @@ if (isNetwork(Network.Arbitrum)) {
                 defaultOrder.makerTokenAmount,
                 {
                     walletContract: makerERC1271Wallet,
+                },
+            )
+            await dealTokenAndApprove(
+                maker,
+                tokenlon.AllowanceTarget,
+                defaultOrder.makerToken,
+                defaultOrder.makerTokenAmount,
+                {
+                    walletContract: makerERC1271WalletETHSign,
                 },
             )
             await dealTokenAndApprove(
@@ -209,6 +225,69 @@ if (isNetwork(Network.Arbitrum)) {
                 await assertFilledByTrader(receipt, order, fill, allowFill)
             })
 
+            it("Should sign and encode valid order for ERC1271 wallet by ETHSign", async () => {
+                const order = {
+                    ...defaultOrder,
+                    maker: makerERC1271WalletETHSign.address,
+                }
+
+                // maker
+                const orderHash = await signingHelper.getLimitOrderEIP712Digest(order, {
+                    chainId: network.chainId,
+                    verifyingContract: tokenlon.LimitOrder.address,
+                })
+                const orderHashSigned = await maker.signMessage(ethers.utils.arrayify(orderHash))
+                const makerSignature = signingHelper.composeSignature(
+                    orderHashSigned,
+                    SignatureType.WalletBytes32,
+                )
+
+                // taker
+                const fill: LimitOrderFill = {
+                    orderHash,
+                    taker: wallet.user.address,
+                    recipient: wallet.user.address,
+                    takerTokenAmount: order.takerTokenAmount,
+                    takerSalt: signingHelper.generateRandomSalt(),
+                    expiry: EXPIRY,
+                }
+                const takerSignature = await signingHelper.signLimitOrderFill(fill, {
+                    type: SignatureType.EIP712,
+                    signer: wallet.user,
+                    verifyingContract: tokenlon.LimitOrder.address,
+                })
+
+                // coordinator
+                const allowFill: LimitOrderAllowFill = {
+                    orderHash,
+                    executor: wallet.user.address,
+                    fillAmount: order.takerTokenAmount,
+                    salt: signingHelper.generateRandomSalt(),
+                    expiry: EXPIRY,
+                }
+                const coordinatorSignature = await signingHelper.signLimitOrderAllowFill(
+                    allowFill,
+                    {
+                        type: SignatureType.EIP712,
+                        signer: coordinator,
+                        verifyingContract: tokenlon.LimitOrder.address,
+                    },
+                )
+
+                const payload = encodingHelper.encodeLimitOrderFillByTrader({
+                    order,
+                    makerSignature,
+                    fill,
+                    takerSignature,
+                    allowFill,
+                    coordinatorSignature,
+                })
+                const tx = await tokenlon.UserProxy.connect(wallet.user).toLimitOrder(payload)
+                const receipt = await tx.wait()
+
+                await assertFilledByTrader(receipt, order, fill, allowFill)
+            })
+
             async function assertFilledByTrader(
                 receipt: ContractReceipt,
                 order: LimitOrder,
@@ -269,10 +348,9 @@ if (isNetwork(Network.Arbitrum)) {
                 })
 
                 // protocol
-                const sushiswapPath = encodingHelper.encodeUniswapV2Path(path)
                 const protocol: LimitOrderProtocolData = {
                     protocol: LimitOrderProtocol.Sushiswap,
-                    data: sushiswapPath,
+                    data: encodingHelper.encodeUniswapV2Path(path),
                     profitRecipient: wallet.user.address,
                     takerTokenAmount: order.takerTokenAmount,
                     protocolOutMinimum: order.takerTokenAmount,
@@ -397,6 +475,71 @@ if (isNetwork(Network.Arbitrum)) {
                     signer: maker,
                     verifyingContract: tokenlon.LimitOrder.address,
                 })
+
+                // protocol
+                const protocol: LimitOrderProtocolData = {
+                    protocol: LimitOrderProtocol.UniswapV3,
+                    data: uniswapV3Path,
+                    profitRecipient: wallet.user.address,
+                    takerTokenAmount: order.takerTokenAmount,
+                    protocolOutMinimum: order.takerTokenAmount,
+                    expiry: EXPIRY,
+                }
+
+                // coordinator
+                const allowFill: LimitOrderAllowFill = {
+                    orderHash,
+                    executor: wallet.user.address,
+                    fillAmount: order.takerTokenAmount,
+                    salt: signingHelper.generateRandomSalt(),
+                    expiry: EXPIRY,
+                }
+                const coordinatorSignature = await signingHelper.signLimitOrderAllowFill(
+                    allowFill,
+                    {
+                        type: SignatureType.EIP712,
+                        signer: coordinator,
+                        verifyingContract: tokenlon.LimitOrder.address,
+                    },
+                )
+
+                const payload = encodingHelper.encodeLimitOrderFillByProtocol({
+                    order,
+                    makerSignature,
+                    protocol,
+                    allowFill,
+                    coordinatorSignature,
+                })
+                const tx = await tokenlon.UserProxy.connect(wallet.user).toLimitOrder(payload)
+                const receipt = await tx.wait()
+
+                await assertFilledByProtocol(receipt, order, protocol, allowFill)
+            })
+
+            it("Should sign and encode valid Uniswap v3 order for ERC1271 wallet by ETHSign", async () => {
+                const order = {
+                    ...defaultOrder,
+                    maker: makerERC1271WalletETHSign.address,
+                }
+                const uniswapV3Path = encodingHelper.encodeUniswapV3Path(
+                    [order.makerToken, order.takerToken],
+                    [UniswapV3Fee.LOW],
+                )
+                order.takerTokenAmount = await uniswap.UniswapV3Quoter.callStatic.quoteExactInput(
+                    uniswapV3Path,
+                    order.makerTokenAmount,
+                )
+
+                // maker
+                const orderHash = await signingHelper.getLimitOrderEIP712Digest(order, {
+                    chainId: network.chainId,
+                    verifyingContract: tokenlon.LimitOrder.address,
+                })
+                const orderHashSigned = await maker.signMessage(ethers.utils.arrayify(orderHash))
+                const makerSignature = signingHelper.composeSignature(
+                    orderHashSigned,
+                    SignatureType.WalletBytes32,
+                )
 
                 // protocol
                 const protocol: LimitOrderProtocolData = {
