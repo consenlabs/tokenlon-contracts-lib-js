@@ -117,7 +117,7 @@ Signing helper generates signature accepted by Tokenlon strategy contracts.
 
 Signing helper supports three types of signature: ([source](https://github.com/consenlabs/tokenlon-contracts-lib-js/blob/main/src/signer/types.ts#L3-L7))
 
-> It's recommended to read [RFQ tests](https://github.com/consenlabs/tokenlon-contracts-lib-js/blob/main/test/v5/RFQ.ts#L19) to see how to configure signature types with specific signature format (EIP712, Ethereum Signed Message).
+> It's recommended to read [strategy contract tests](https://github.com/consenlabs/tokenlon-contracts-lib-js/blob/main/test/v5/) to see how to configure signature types with specific signature format (EIP712, Ethereum Signed Message).
 
 ```typescript
 enum SignatureType {
@@ -149,10 +149,26 @@ type SigningOptions = {
 }
 ```
 
+For advanced users who need other signature format than EIP712, you can get raw digest to sign by `getXXXEIP712Digest` functions with following required options:
+
+```typescript
+type EIP712DomainOptions = {
+    // Chain id the verifying contract is located on.
+    chainId: number
+
+    // Address of Tokenlon strategy contract
+    verifyingContract: string
+}
+```
+
 The `v5` signing helper implements the following interface:
 
 ```typescript
 interface SigningHelper {
+    /* utils */
+
+    generateRandomSalt(): BigNumber
+
     /* AMM */
 
     getAMMOrderEIP712Types(): EIP712Types
