@@ -1,5 +1,6 @@
 import { Wallet } from "ethers"
 import { ethers } from "hardhat"
+import { SnapshotRestorer, takeSnapshot } from "@nomicfoundation/hardhat-network-helpers"
 
 import { Addresses, addresses } from "@network"
 import {
@@ -16,7 +17,6 @@ import {
 } from "@typechain"
 
 import { dealETH } from "./balance"
-import { Snapshot } from "./snapshot"
 
 export type Context = {
     wallet: {
@@ -44,8 +44,11 @@ export type Context = {
     sushiswap: {
         SushiswapRouter: IUniswapV2Router
     }
-    addresses: Addresses
-    snapshot: Snapshot
+    network: {
+        addresses: Addresses
+        chainId: number
+    }
+    snapshot: SnapshotRestorer
 }
 
 const __ctx__ = setupContext()
@@ -95,8 +98,11 @@ async function setupContext(): Promise<Context> {
                 addresses.SushiswapRouter,
             ),
         },
-        addresses: addresses,
-        snapshot: await Snapshot.take(),
+        network: {
+            addresses: addresses,
+            chainId: (await ethers.provider.getNetwork()).chainId,
+        },
+        snapshot: await takeSnapshot(),
     }
 }
 
@@ -114,10 +120,10 @@ export const contextSuite = async function (
     const ctx = await __ctx__
 
     ;(decorator ? describe[decorator] : describe)(title, () => {
-        let snapshot: Snapshot
+        let snapshot: SnapshotRestorer
 
         before(async () => {
-            await ctx.snapshot.reset()
+            await ctx.snapshot.restore()
             await Promise.all(
                 Object.values(ctx.wallet).map((w) => dealETH(w, ethers.utils.parseEther("100"))),
             )
@@ -126,11 +132,11 @@ export const contextSuite = async function (
         suite(ctx)
 
         before(async () => {
-            snapshot = await Snapshot.take()
+            snapshot = await takeSnapshot()
         })
 
         beforeEach(async () => {
-            await snapshot.reset()
+            await snapshot.restore()
         })
     })
 } as ContextSuiteFunction

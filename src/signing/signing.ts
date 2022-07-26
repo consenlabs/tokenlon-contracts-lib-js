@@ -34,7 +34,7 @@ export class SigningHelper {
         return {
             name: this.name,
             version: this.version,
-            chainId: await options.signer.getChainId(),
+            chainId: options.chainId,
             verifyingContract: options.verifyingContract,
         }
     }
@@ -56,7 +56,10 @@ export class SigningHelper {
         value: EIP712Value,
         options: SigningOptions,
     ): Promise<string> {
-        const domain = await this.getEIP712Domain(options)
+        const domain = await this.getEIP712Domain({
+            chainId: await options.signer.getChainId(),
+            verifyingContract: options.verifyingContract,
+        })
         const signature = await options.signer._signTypedData(domain, types, value)
         const signatureComposed = this.composeSignature(signature, options.type)
         return signatureComposed
