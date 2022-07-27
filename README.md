@@ -8,6 +8,8 @@ JavaScript library for [Tokenlon](https://tokenlon.im/) contracts.
 $ npm install @tokenlon/contracts-lib
 ```
 
+This library requires `ethers` as peer dependency. Please remember to install `ethers` yourself with version in the caret range `^5.0.0`.
+
 ## Usage
 
 This library provides helpers for signing signature and encoding data that is required to interact with Tokenlon strategy contracts. Each version of Tokenlon will have its dedicated library which is separated by directory. For example, the latest Tokenlon version is `v5`, and the `v5` dedicated library will be located at `@tokenlon/contracts-lib/v5`.
