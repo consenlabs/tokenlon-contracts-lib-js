@@ -5,7 +5,7 @@ JavaScript library for [Tokenlon](https://tokenlon.im/) contracts.
 ## Installation
 
 ```bash
-$ npm install git+https://github.com/consenlabs/tokenlon-contracts-lib-js
+$ npm install @tokenlon/contracts-lib
 ```
 
 ## Usage
