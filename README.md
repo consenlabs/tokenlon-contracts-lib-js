@@ -1,4 +1,4 @@
-# tokenlon-contracts-lib-js
+# tokenlon-contracts-lib-js ![Build Status](https://github.com/consenlabs/tokenlon-contracts-lib-js/actions/workflows/nodejs.yaml/badge.svg?branch=main)
 
 JavaScript library for [Tokenlon](https://tokenlon.im/) contracts.
 
