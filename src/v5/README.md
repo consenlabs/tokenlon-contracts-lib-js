@@ -149,7 +149,7 @@ type SigningOptions = {
 }
 ```
 
-For advanced users who need other signature format than EIP712, you can get raw digest to sign by `getXXXEIP712Digest` functions with following required options:
+For advanced users who need other signature format than EIP712, you can get raw digest to sign by `get{StrategyOrder}EIP712Digest` functions with following required options:
 
 ```typescript
 type EIP712DomainOptions = {
