@@ -1,11 +1,14 @@
 {
-  "name": "tokenlon-lib",
+  "name": "@tokenlon/contracts-lib",
   "version": "0.0.0",
-  "main": "index.js",
   "author": "imToken Labs",
+  "homepage": "https://github.com/consenlabs/tokenlon-contracts-lib-js",
   "license": "MIT",
+  "files": [
+    "dist"
+  ],
   "scripts": {
-    "build": "tsc -p ./tsconfig.build.json",
+    "build": "tsc -p ./tsconfig.build.json && tsc-alias -p ./tsconfig.build.json",
     "compile-sol": "hardhat compile",
     "lint": "eslint --ignore-path .prettierignore \"./**/*.ts\" && prettier --check .",
     "test": "hardhat test"
@@ -34,8 +37,12 @@
     "hardhat": "^2.9.9",
     "prettier": "^2.7.1",
     "ts-node": "^10.8.1",
+    "tsc-alias": "^1.7.0",
     "tsconfig-paths": "^4.0.0",
     "typechain": "^8.1.0",
     "typescript": "^4.7.3"
+  },
+  "peerDependencies": {
+    "ethers": "^5.0.0"
   }
 }

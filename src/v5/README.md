@@ -1,4 +1,4 @@
-# tokenlon-contracts-lib-js/v5
+# @tokenlon/contracts-lib/v5
 
 Tokenlon `v5` library supports the following Tokenlon strategy contracts:
 
@@ -20,12 +20,7 @@ Tokenlon `v5` library supports the following Tokenlon strategy contracts:
 
 ```typescript
 import { ethers } from "ethers"
-import {
-    AMMOrder,
-    SignatureType,
-    encodingHelper,
-    signingHelper,
-} from "tokenlon-contracts-lib-js/v5"
+import { AMMOrder, SignatureType, encodingHelper, signingHelper } from "@tokenlon/contracts-lib/v5"
 
 declare const user: ethers.Wallet
 declare const order: AMMOrder
@@ -50,12 +45,7 @@ await Tokenlon.connect(user).toAMM(payload)
 
 ```typescript
 import { ethers } from "ethers"
-import {
-    AMMOrder,
-    SignatureType,
-    encodingHelper,
-    signingHelper,
-} from "tokenlon-contracts-lib-js/v5"
+import { AMMOrder, SignatureType, encodingHelper, signingHelper } from "@tokenlon/contracts-lib/v5"
 
 declare const user: ethers.Wallet
 declare const userERC1271Wallet: ethers.Contract
@@ -82,12 +72,7 @@ await Tokenlon.connect(user).toAMM(payload)
 
 ```typescript
 import { ethers } from "ethers"
-import {
-    AMMOrder,
-    SignatureType,
-    encodingHelper,
-    signingHelper,
-} from "tokenlon-contracts-lib-js/v5"
+import { AMMOrder, SignatureType, encodingHelper, signingHelper } from "@tokenlon/contracts-lib/v5"
 
 declare const user: ethers.Wallet
 declare const userERC1271Wallet: ethers.Contract
