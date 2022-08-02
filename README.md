@@ -1,6 +1,6 @@
 # @tokenlon/contracts-lib ![Build Status](https://github.com/consenlabs/tokenlon-contracts-lib-js/actions/workflows/nodejs.yaml/badge.svg?branch=main)
 
-A JavaScript library providing stuffs you need (e.g., signing order, encoding data) to interact with [Tokenlon contracts](https://github.com/consenlabs/tokenlon-contracts).
+Common utility functions (e.g., signing order, encoding data) to interact with [Tokenlon contracts](https://github.com/consenlabs/tokenlon-contracts).
 
 ## Installation
 
