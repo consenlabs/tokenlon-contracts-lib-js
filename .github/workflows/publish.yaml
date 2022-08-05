@@ -1,0 +1,48 @@
+name: Publish
+
+on:
+  release:
+    types: [created]
+
+jobs:
+  build:
+    uses: consenlabs/tokenlon-contracts-lib-js/.github/workflows/build.yaml@3aeb7866eea82a1dce48161f02b333def35e594e
+    secrets: inherit
+
+  publish:
+    needs: build
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Use Node.js 14
+        uses: actions/setup-node@v3
+        with:
+          node-version: 14
+          registry-url: "https://registry.npmjs.org"
+
+      - name: Install
+        run: yarn install --frozen-lockfile
+
+      - name: Build
+        run: yarn run build
+
+      - name: Get dist tag
+        run: |
+          case "${{ github.event.release.name }}" in
+          *"rc"* | *"canary"*)
+           echo "DIST_TAG=canary" >> $GITHUB_ENV;;
+          *"dev"*)
+           echo "DIST_TAG=dev" >> $GITHUB_ENV;;
+          *"beta"*)
+           echo "DIST_TAG=beta" >> $GITHUB_ENV;;
+          *)
+           echo "DIST_TAG=latest" >> $GITHUB_ENV;;
+          esac
+
+      - name: Publish
+        run: npm publish --access public --tag ${{ env.DIST_TAG }}
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

@@ -1,0 +1,11 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  build:
+    uses: consenlabs/tokenlon-contracts-lib-js/.github/workflows/build.yaml@3aeb7866eea82a1dce48161f02b333def35e594e
+    secrets: inherit

@@ -1,4 +1,4 @@
-# @tokenlon/contracts-lib ![Build Status](https://github.com/consenlabs/tokenlon-contracts-lib-js/actions/workflows/nodejs.yaml/badge.svg?branch=main)
+# @tokenlon/contracts-lib ![Build Status](https://github.com/consenlabs/tokenlon-contracts-lib-js/actions/workflows/ci.yaml/badge.svg?branch=main)
 
 Common utility functions (e.g., signing order, encoding data) to interact with [Tokenlon contracts](https://github.com/consenlabs/tokenlon-contracts).
 
