@@ -43,6 +43,7 @@ jobs:
           esac
 
       - name: Publish
+        working-directory: dist
         run: npm publish --access public --tag ${{ env.DIST_TAG }}
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
