@@ -3,6 +3,12 @@
   "version": "0.0.0",
   "author": "imToken Labs",
   "homepage": "https://github.com/consenlabs/tokenlon-contracts-lib-js",
+  "keywords": [
+    "tokenlon",
+    "contract",
+    "signing",
+    "encoding"
+  ],
   "license": "MIT",
   "scripts": {
     "build": "tsc -p ./tsconfig.build.json && tsc-alias -p ./tsconfig.build.json && cp LICENSE package.json README.md dist",
