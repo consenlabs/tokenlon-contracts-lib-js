@@ -1,14 +1,17 @@
 {
   "name": "@tokenlon/contracts-lib",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "author": "imToken Labs",
   "homepage": "https://github.com/consenlabs/tokenlon-contracts-lib-js",
-  "license": "MIT",
-  "files": [
-    "dist"
+  "keywords": [
+    "tokenlon",
+    "contract",
+    "signing",
+    "encoding"
   ],
+  "license": "MIT",
   "scripts": {
-    "build": "tsc -p ./tsconfig.build.json && tsc-alias -p ./tsconfig.build.json",
+    "build": "tsc -p ./tsconfig.build.json && tsc-alias -p ./tsconfig.build.json && cp LICENSE package.json README.md dist",
     "compile-sol": "hardhat compile",
     "lint": "eslint --ignore-path .prettierignore \"./**/*.ts\" && prettier --check .",
     "test": "hardhat test"
