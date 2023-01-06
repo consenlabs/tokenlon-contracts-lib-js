@@ -11,6 +11,7 @@ export default {
     AMMWrapperWithPath: "",
     LimitOrder: "0xdC842f306d05Fc0e3A2469976ab860B453Af2D1A",
     RFQ: "",
+    L2Deposit: "",
     UserProxy: "0x0dCd8690730A3Bd2cfC46976B01B5905E8269ad4",
 
     // Uniswap
@@ -23,4 +24,13 @@ export default {
 
     // Curve
     Curve3Pool: "",
+
+    // L2 Bridge
+    ArbitrumL1GatewayRouter: "",
+    OptimismL1StandardBridge: "",
+
+    // L2 Token
+    DAIForArbitrumBridge: "",
+    USDCForArbitrumBridge: "",
+    USDTForArbitrumBridge: "",
 }

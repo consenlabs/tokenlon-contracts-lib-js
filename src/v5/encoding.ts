@@ -9,6 +9,9 @@ import {
     LimitOrderFillByProtocolData,
     LimitOrderFillByTraderData,
     RFQFillData,
+    L2DepositData,
+    L2ArbitrumDepositData,
+    L2OptimismDepositData,
 } from "./types"
 
 export class EncodingHelper {
@@ -160,7 +163,41 @@ export class EncodingHelper {
         ])
     }
 
+    /* L2 Deposit */
+
+    // To comply with: https://github.com/consenlabs/tokenlon-contracts/blob/master/contracts/interfaces/IL2Deposit.sol#L29-L36
+    public encodeL2Deposit(data: L2DepositData): string {
+        const i = new ethers.utils.Interface(abi.L2Deposit)
+        return i.encodeFunctionData("deposit", [
+            [
+                [
+                    data.deposit.l2Identifier,
+                    data.deposit.l1TokenAddr,
+                    data.deposit.l2TokenAddr,
+                    data.deposit.sender,
+                    data.deposit.recipient,
+                    data.deposit.amount,
+                    data.deposit.salt,
+                    data.deposit.expiry,
+                    data.deposit.data,
+                ],
+                data.depositSig,
+            ],
+        ])
+    }
+
     /* Vendor */
+
+    public encodeL2ArbitrumDepositData(user: string, data: L2ArbitrumDepositData): string {
+        return ethers.utils.defaultAbiCoder.encode(
+            ["address", "uint256", "uint256", "uint256"],
+            [user, data.maxSubmissionCost, data.maxGas, data.gasPriceBid],
+        )
+    }
+
+    public encodeL2OptimismDepositData(data: L2OptimismDepositData): string {
+        return ethers.utils.defaultAbiCoder.encode(["uint32"], [data.l2Gas])
+    }
 
     public encodeUniswapV2Path(path: string[]) {
         return ethers.utils.defaultAbiCoder.encode(["address[]"], [path])

@@ -2,11 +2,13 @@
 
 Tokenlon `v5` library supports the following Tokenlon strategy contracts:
 
--   Mainnet
+-   Mainnet:
     -   AMM
     -   RFQ
 -   Arbitrum:
     -   Limit Order
+-   Goerli:
+    -   L2 Deposit
 
 > Addresses of Tokenlon strategy contracts can be found in [tokenlon-contracts](https://github.com/consenlabs/tokenlon-contracts).
 
@@ -204,6 +206,14 @@ interface SigningHelper {
     getRFQFillEIP712StructHash(order: RFQFill): string
 
     signRFQFillOrder(fill: RFQFill, options: SigningOptions): Promise<string>
+
+    /* L2 Deposit */
+
+    getL2DepositEIP712Types(): EIP712Types
+    getL2DepositEIP712Digest(deposit: L2Deposit, options: EIP712DomainOptions): Promise<string>
+    getL2DepositEIP712StructHash(deposit: L2Deposit): string
+
+    signL2Deposit(deposit: L2Deposit, options: SigningOptions): Promise<string>
 }
 ```
 
@@ -234,8 +244,14 @@ interface EncodingHelper {
 
     encodeRFQFill(data: RFQFillData): string
 
+    /* L2 Deposit */
+
+    encodeL2Deposit(data: L2DepositData): string
+
     /* Vendor */
 
+    encodeL2ArbitrumDepositData(user: string, data: L2ArbitrumDepositData): string
+    encodeL2OptimismDepositData(data: L2OptimismDepositData): string
     encodeUniswapV2Path(path: string[]): string
     encodeUniswapV3Path(path: string[], fees: number[]): string
 }

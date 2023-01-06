@@ -158,3 +158,32 @@ export type RFQFillData = {
     makerSignature: BytesLike
     takerSignature: BytesLike
 }
+
+/* L2 Deposit */
+
+export type L2Deposit = {
+    l2Identifier: number
+    l1TokenAddr: string
+    l2TokenAddr: string
+    sender: string
+    recipient: string
+    amount: BigNumberish
+    salt: BigNumberish
+    expiry: number
+    data: BytesLike
+}
+
+export type L2DepositData = {
+    deposit: L2Deposit
+    depositSig: BytesLike
+}
+
+export type L2ArbitrumDepositData = {
+    maxSubmissionCost: BigNumberish
+    maxGas: BigNumberish
+    gasPriceBid: BigNumberish
+}
+
+export type L2OptimismDepositData = {
+    l2Gas: BigNumberish
+}
