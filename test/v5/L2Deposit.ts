@@ -24,15 +24,13 @@ enum L2Identifier {
     Optimism,
 }
 
-const zeroAddress = "0x" + "0".repeat(40)
-
 if (isNetwork(Network.Goerli)) {
     contextSuite("L2Deposit", ({ wallet, network, token, tokenlon }) => {
         // Configure the default deposit information
         const defaultDeposit: L2Deposit = {
             l2Identifier: 0,
-            l1TokenAddr: zeroAddress,
-            l2TokenAddr: zeroAddress,
+            l1TokenAddr: ethers.constants.AddressZero,
+            l2TokenAddr: ethers.constants.AddressZero,
             sender: wallet.user.address,
             recipient: wallet.user.address,
             amount: 100,
@@ -72,7 +70,7 @@ if (isNetwork(Network.Goerli)) {
                     wallet.user,
                     tokenlon.AllowanceTarget,
                     deposit.l1TokenAddr,
-                    defaultDeposit.amount,
+                    deposit.amount,
                 )
                 // Sign the deposit data using the EOA
                 const depositSig = await signingHelper.signL2Deposit(deposit, {
@@ -92,7 +90,7 @@ if (isNetwork(Network.Goerli)) {
                 // Wait for the block to be mined and the transaction will be completed
                 const receipt = await tx.wait()
                 // Verify that the event outputs are equal to the deposit data parameters
-                assertEvent(receipt, deposit)
+                assertDepositedEvent(receipt, deposit)
             })
 
             // Test for the ERC1271 wallet on the Arbitrum bridge
@@ -117,7 +115,7 @@ if (isNetwork(Network.Goerli)) {
                     wallet.user,
                     tokenlon.AllowanceTarget,
                     deposit.l1TokenAddr,
-                    defaultDeposit.amount,
+                    deposit.amount,
                     {
                         walletContract: erc1271Wallet,
                     },
@@ -140,7 +138,7 @@ if (isNetwork(Network.Goerli)) {
                 // Wait for the block to be mined and the transaction will be completed
                 const receipt = await tx.wait()
                 // Verify that the event outputs are equal to the deposit data parameters
-                assertEvent(receipt, deposit)
+                assertDepositedEvent(receipt, deposit)
             })
 
             // Test for the ERC1271 wallet using ETHSign
@@ -165,7 +163,7 @@ if (isNetwork(Network.Goerli)) {
                     wallet.user,
                     tokenlon.AllowanceTarget,
                     deposit.l1TokenAddr,
-                    defaultDeposit.amount,
+                    deposit.amount,
                     {
                         walletContract: erc1271Wallet,
                     },
@@ -194,7 +192,7 @@ if (isNetwork(Network.Goerli)) {
                 // Wait for the block to be mined and the transaction will be completed
                 const receipt = await tx.wait()
                 // Verify that the event outputs are equal to the deposit data parameters
-                assertEvent(receipt, deposit)
+                assertDepositedEvent(receipt, deposit)
             })
         })
 
@@ -216,7 +214,7 @@ if (isNetwork(Network.Goerli)) {
                     wallet.user,
                     tokenlon.AllowanceTarget,
                     deposit.l1TokenAddr,
-                    defaultDeposit.amount,
+                    deposit.amount,
                 )
                 // Sign the deposit data using the EOA
                 const depositSig = await signingHelper.signL2Deposit(deposit, {
@@ -234,7 +232,7 @@ if (isNetwork(Network.Goerli)) {
                 // Wait for the block to be mined and the transaction will be completed
                 const receipt = await tx.wait()
                 // Verify that the event outputs are equal to the deposit data parameters
-                assertEvent(receipt, deposit)
+                assertDepositedEvent(receipt, deposit)
             })
 
             // Test for the ERC1271 wallet
@@ -256,7 +254,7 @@ if (isNetwork(Network.Goerli)) {
                     wallet.user,
                     tokenlon.AllowanceTarget,
                     deposit.l1TokenAddr,
-                    defaultDeposit.amount,
+                    deposit.amount,
                     {
                         walletContract: erc1271Wallet,
                     },
@@ -277,7 +275,7 @@ if (isNetwork(Network.Goerli)) {
                 // Wait for the block to be mined and the transaction will be completed
                 const receipt = await tx.wait()
                 // Verify that the event outputs are equal to the deposit data parameters
-                assertEvent(receipt, deposit)
+                assertDepositedEvent(receipt, deposit)
             })
 
             // Test for the ERC1271 wallet using ETHSign
@@ -300,7 +298,7 @@ if (isNetwork(Network.Goerli)) {
                     wallet.user,
                     tokenlon.AllowanceTarget,
                     deposit.l1TokenAddr,
-                    defaultDeposit.amount,
+                    deposit.amount,
                     {
                         walletContract: erc1271Wallet,
                     },
@@ -327,7 +325,7 @@ if (isNetwork(Network.Goerli)) {
                 // Wait for the block to be mined and the transaction will be completed
                 const receipt = await tx.wait()
                 // Verify that the event outputs are equal to the deposit data parameters
-                assertEvent(receipt, deposit)
+                assertDepositedEvent(receipt, deposit)
             })
         })
 
@@ -341,7 +339,7 @@ if (isNetwork(Network.Goerli)) {
         }
 
         // Verify that the event data are equal to the deposit data parameters
-        function assertEvent(receipt: ContractReceipt, deposit: L2Deposit) {
+        function assertDepositedEvent(receipt: ContractReceipt, deposit: L2Deposit) {
             // Parse the event data
             const [{ args }] = parseLogsByName(tokenlon.L2Deposit, "Deposited", receipt.logs)
             // Verify the deposit data
