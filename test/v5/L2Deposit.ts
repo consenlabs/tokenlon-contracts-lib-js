@@ -208,7 +208,7 @@ if (isNetwork(Network.Goerli)) {
                     ...defaultDeposit,
                     l2Identifier: L2Identifier.Optimism,
                     l1TokenAddr: token.USDT.address,
-                    l2TokenAddr: zeroAddress, // It does not matter for Optimism bridge
+                    l2TokenAddr: token.USDTForOptimismBridge.address, // It does not matter for Optimism bridge
                     data: encodingHelper.encodeL2OptimismDepositData(optimismGasData),
                 }
                 // Obtain a specific amount of tokens and approve their to be used by the AllowanceTarget contract
@@ -246,7 +246,7 @@ if (isNetwork(Network.Goerli)) {
                     ...defaultDeposit,
                     l1TokenAddr: token.USDT.address,
                     l2Identifier: L2Identifier.Optimism,
-                    l2TokenAddr: zeroAddress, // It does not matter for Optimism bridge
+                    l2TokenAddr: token.USDTForOptimismBridge.address, // It does not matter for Optimism bridge
                     sender: erc1271Wallet.address,
                     recipient: erc1271Wallet.address,
                     data: encodingHelper.encodeL2OptimismDepositData(optimismGasData),
@@ -290,7 +290,7 @@ if (isNetwork(Network.Goerli)) {
                     ...defaultDeposit,
                     l1TokenAddr: token.USDT.address,
                     l2Identifier: L2Identifier.Optimism,
-                    l2TokenAddr: zeroAddress, // It does not matter for Optimism bridge
+                    l2TokenAddr: token.USDTForOptimismBridge.address, // It does not matter for Optimism bridge
                     sender: erc1271Wallet.address,
                     recipient: erc1271Wallet.address,
                     data: encodingHelper.encodeL2OptimismDepositData(optimismGasData),

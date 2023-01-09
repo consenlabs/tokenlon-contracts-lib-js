@@ -51,6 +51,9 @@ export type Addresses = {
     DAIForArbitrumBridge: string
     USDCForArbitrumBridge: string
     USDTForArbitrumBridge: string
+    DAIForOptimismBridge: string
+    USDCForOptimismBridge: string
+    USDTForOptimismBridge: string
 }
 
 export const addresses = require(`./${Network[network].toLowerCase()}.ts`).default as Addresses

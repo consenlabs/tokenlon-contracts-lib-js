@@ -33,4 +33,7 @@ export default {
     DAIForArbitrumBridge: "",
     USDCForArbitrumBridge: "",
     USDTForArbitrumBridge: "",
+    DAIForOptimismBridge: "",
+    USDCForOptimismBridge: "",
+    USDTForOptimismBridge: "",
 }
