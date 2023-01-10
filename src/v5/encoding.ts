@@ -57,17 +57,20 @@ export class EncodingHelper {
 
     public encodeAMMUniswapV3SingleHopData(fee: number): string {
         const swapType = 1
-        return ethers.utils.defaultAbiCoder.encode(["uint8", "uint24"], [swapType, fee])
+        const coder = ethers.utils.defaultAbiCoder
+        return coder.encode(["uint8", "uint24"], [swapType, fee])
     }
 
     public encodeAMMUniswapV3MultiHopsData(path: string[], fees: number[]): string {
         const swapType = 2
         const uniswapV3Path = encodeUniswapV3Path(path, fees)
-        return ethers.utils.defaultAbiCoder.encode(["uint8", "bytes"], [swapType, uniswapV3Path])
+        const coder = ethers.utils.defaultAbiCoder
+        return coder.encode(["uint8", "bytes"], [swapType, uniswapV3Path])
     }
 
     public encodeAMMCurveData(version: number): string {
-        return ethers.utils.defaultAbiCoder.encode(["uint8"], [version])
+        const coder = ethers.utils.defaultAbiCoder
+        return coder.encode(["uint8"], [version])
     }
 
     /* Limit Order */
@@ -189,18 +192,21 @@ export class EncodingHelper {
     /* Vendor */
 
     public encodeL2ArbitrumDepositData(user: string, data: L2ArbitrumDepositData): string {
-        return ethers.utils.defaultAbiCoder.encode(
+        const coder = ethers.utils.defaultAbiCoder
+        return coder.encode(
             ["address", "uint256", "uint256", "uint256"],
             [user, data.maxSubmissionCost, data.maxGas, data.gasPriceBid],
         )
     }
 
     public encodeL2OptimismDepositData(data: L2OptimismDepositData): string {
-        return ethers.utils.defaultAbiCoder.encode(["uint32"], [data.l2Gas])
+        const coder = ethers.utils.defaultAbiCoder
+        return coder.encode(["uint32"], [data.l2Gas])
     }
 
     public encodeUniswapV2Path(path: string[]) {
-        return ethers.utils.defaultAbiCoder.encode(["address[]"], [path])
+        const coder = ethers.utils.defaultAbiCoder
+        return coder.encode(["address[]"], [path])
     }
 
     public encodeUniswapV3Path(path: string[], fees: number[]) {
