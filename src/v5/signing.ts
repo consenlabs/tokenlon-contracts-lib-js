@@ -11,6 +11,7 @@ import {
     LimitOrderFill,
     RFQFill,
     RFQOrder,
+    L2Deposit,
 } from "./types"
 
 export class SigningHelper extends BaseSigningHelper {
@@ -229,5 +230,40 @@ export class SigningHelper extends BaseSigningHelper {
 
     public signRFQFillOrder(fill: RFQFill, options: SigningOptions): Promise<string> {
         return this.signEIP712(this.getRFQFillEIP712Types(), fill, options)
+    }
+
+    /* L2 Deposit */
+
+    public getL2DepositEIP712Types(): EIP712Types {
+        return {
+            Deposit: [
+                { name: "l2Identifier", type: "uint8" },
+                { name: "l1TokenAddr", type: "address" },
+                { name: "l2TokenAddr", type: "address" },
+                { name: "sender", type: "address" },
+                { name: "recipient", type: "address" },
+                { name: "amount", type: "uint256" },
+                { name: "salt", type: "uint256" },
+                { name: "expiry", type: "uint256" },
+                { name: "data", type: "bytes" },
+            ],
+        }
+    }
+
+    public async getL2DepositEIP712Digest(
+        deposit: L2Deposit,
+        options: EIP712DomainOptions,
+    ): Promise<string> {
+        const domain = await this.getEIP712Domain(options)
+        const types = this.getL2DepositEIP712Types()
+        return this.getEIP712Digest(domain, types, deposit)
+    }
+
+    public getL2DepositEIP712StructHash(deposit: L2Deposit): string {
+        return this.getEIP712StructHash("Deposit", this.getL2DepositEIP712Types(), deposit)
+    }
+
+    public signL2Deposit(deposit: L2Deposit, options: SigningOptions): Promise<string> {
+        return this.signEIP712(this.getL2DepositEIP712Types(), deposit, options)
     }
 }

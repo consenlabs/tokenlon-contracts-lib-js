@@ -5,4 +5,5 @@ interface IUserProxy {
     function toAMM(bytes calldata _payload) external payable;
     function toLimitOrder(bytes calldata _payload) external payable;
     function toRFQ(bytes calldata _payload) external payable;
+    function toL2Deposit(bytes calldata _payload) external payable;
 }

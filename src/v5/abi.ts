@@ -564,4 +564,79 @@ export default {
             type: "function",
         },
     ],
+    L2Deposit: [
+        /* deposit */
+        {
+            inputs: [
+                {
+                    components: [
+                        {
+                            components: [
+                                {
+                                    internalType: "enum IL2Deposit.L2Identifier",
+                                    name: "l2Identifier",
+                                    type: "uint8",
+                                },
+                                {
+                                    internalType: "address",
+                                    name: "l1TokenAddr",
+                                    type: "address",
+                                },
+                                {
+                                    internalType: "address",
+                                    name: "l2TokenAddr",
+                                    type: "address",
+                                },
+                                {
+                                    internalType: "address",
+                                    name: "sender",
+                                    type: "address",
+                                },
+                                {
+                                    internalType: "address",
+                                    name: "recipient",
+                                    type: "address",
+                                },
+                                {
+                                    internalType: "uint256",
+                                    name: "amount",
+                                    type: "uint256",
+                                },
+                                {
+                                    internalType: "uint256",
+                                    name: "salt",
+                                    type: "uint256",
+                                },
+                                {
+                                    internalType: "uint256",
+                                    name: "expiry",
+                                    type: "uint256",
+                                },
+                                {
+                                    internalType: "bytes",
+                                    name: "data",
+                                    type: "bytes",
+                                },
+                            ],
+                            internalType: "struct IL2Deposit.Deposit",
+                            name: "deposit",
+                            type: "tuple",
+                        },
+                        {
+                            internalType: "bytes",
+                            name: "depositSig",
+                            type: "bytes",
+                        },
+                    ],
+                    internalType: "struct IL2Deposit.DepositParams",
+                    name: "_params",
+                    type: "tuple",
+                },
+            ],
+            name: "deposit",
+            outputs: [],
+            stateMutability: "payable",
+            type: "function",
+        },
+    ],
 }

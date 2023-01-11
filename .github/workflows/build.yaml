@@ -35,6 +35,13 @@ jobs:
           FORK_BLOCK_NUMBER: 14995000
         run: yarn run test
 
+      - name: Test (Goerli)
+        env:
+          CHAIN_ID: 5
+          FORK_NODE_RPC_URL: ${{ secrets.GOERLI_NODE_RPC_URL }}
+          FORK_BLOCK_NUMBER: 8185185
+        run: yarn run test
+
       - name: Test (Arbitrum)
         env:
           CHAIN_ID: 42161

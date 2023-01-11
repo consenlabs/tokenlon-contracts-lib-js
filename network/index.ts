@@ -1,5 +1,6 @@
 export enum Network {
     Mainnet = 1,
+    Goerli = 5,
     Arbitrum = 42161,
 }
 
@@ -28,6 +29,7 @@ export type Addresses = {
     AMMWrapperWithPath: string
     LimitOrder: string
     RFQ: string
+    L2Deposit: string
     UserProxy: string
 
     // Uniswap
@@ -40,6 +42,18 @@ export type Addresses = {
 
     // Curve
     Curve3Pool: string
+
+    // L2 Bridge
+    ArbitrumL1GatewayRouter: string
+    OptimismL1StandardBridge: string
+
+    // L2 Token
+    DAIForArbitrumBridge: string
+    USDCForArbitrumBridge: string
+    USDTForArbitrumBridge: string
+    DAIForOptimismBridge: string
+    USDCForOptimismBridge: string
+    USDTForOptimismBridge: string
 }
 
 export const addresses = require(`./${Network[network].toLowerCase()}.ts`).default as Addresses
