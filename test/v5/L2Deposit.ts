@@ -168,7 +168,7 @@ if (isNetwork(Network.Goerli)) {
                         walletContract: erc1271Wallet,
                     },
                 )
-                // Add "\x19\x01" string to the data to be signed in order to avoid the risk of eth_sign.
+                // Encode the contents of deposit parameters to conform to EIP-712 format
                 const digest = await signingHelper.getL2DepositEIP712Digest(deposit, {
                     chainId: network.chainId,
                     verifyingContract: tokenlon.L2Deposit.address,
@@ -303,7 +303,7 @@ if (isNetwork(Network.Goerli)) {
                         walletContract: erc1271Wallet,
                     },
                 )
-                // Add "\x19\x01" string to the data to be signed in order to avoid the risk of eth_sign.
+                // Encode the contents of deposit parameters to conform to EIP-712 format
                 const digest = await signingHelper.getL2DepositEIP712Digest(deposit, {
                     chainId: network.chainId,
                     verifyingContract: tokenlon.L2Deposit.address,
