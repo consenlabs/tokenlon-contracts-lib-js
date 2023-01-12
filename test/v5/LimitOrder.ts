@@ -29,7 +29,7 @@ import {
 } from "@test/utils/contract"
 import { ERC1271Wallet } from "@typechain"
 
-if (isNetwork(Network.Arbitrum)) {
+if (isNetwork(Network.ArbitrumMainnet)) {
     contextSuite("LimitOrder", ({ wallet, network, token, tokenlon, uniswap, sushiswap }) => {
         const coordinator = Wallet.createRandom().connect(ethers.provider)
         const maker = Wallet.createRandom().connect(ethers.provider)

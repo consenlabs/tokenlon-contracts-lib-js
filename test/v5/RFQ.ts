@@ -14,7 +14,7 @@ import {
     parseLogsByName,
 } from "@test/utils/contract"
 
-if (isNetwork(Network.Mainnet)) {
+if (isNetwork(Network.EthereumMainnet)) {
     contextSuite("RFQ", ({ wallet, network, token, tokenlon }) => {
         const maker = Wallet.createRandom().connect(ethers.provider)
         const defaultOrder: RFQOrder = {

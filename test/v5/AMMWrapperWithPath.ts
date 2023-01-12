@@ -15,7 +15,7 @@ import {
     parseLogsByName,
 } from "@test/utils/contract"
 
-if (isNetwork(Network.Mainnet)) {
+if (isNetwork(Network.EthereumMainnet)) {
     contextSuite("AMMWrapperWithPath", ({ wallet, network, token, tokenlon, uniswap }) => {
         const defaultOrder: AMMOrder = {
             // Should fill following fields in each case

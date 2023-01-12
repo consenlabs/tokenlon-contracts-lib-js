@@ -26,7 +26,7 @@ enum L2Identifier {
     Optimism,
 }
 
-if (isNetwork(Network.Goerli)) {
+if (isNetwork(Network.EthereumGoerli)) {
     contextSuite("L2Deposit", ({ wallet, network, token, tokenlon }) => {
         // Configure the default deposit information
         const defaultDeposit: L2Deposit = {
