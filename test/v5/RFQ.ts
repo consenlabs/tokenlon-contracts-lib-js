@@ -14,185 +14,186 @@ import {
     parseLogsByName,
 } from "@test/utils/contract"
 
-if (isNetwork(Network.Mainnet)) {
-    contextSuite("RFQ", ({ wallet, network, token, tokenlon }) => {
-        const maker = Wallet.createRandom().connect(ethers.provider)
-        const defaultOrder: RFQOrder = {
-            // Could override following fields at need in each case
-            takerAddr: wallet.user.address,
-            makerAddr: maker.address,
-            takerAssetAddr: token.WETH.address,
-            makerAssetAddr: token.DAI.address,
-            takerAssetAmount: 1,
-            makerAssetAmount: 1000,
-            salt: signingHelper.generateRandomSalt(),
-            deadline: EXPIRY,
-            feeFactor: 0,
-        }
+contextSuite("RFQ", ({ wallet, network, token, tokenlon }) => {
+    if (!isNetwork(Network.Mainnet)) {
+        return
+    }
+    const maker = Wallet.createRandom().connect(ethers.provider)
+    const defaultOrder: RFQOrder = {
+        // Could override following fields at need in each case
+        takerAddr: wallet.user.address,
+        makerAddr: maker.address,
+        takerAssetAddr: token.WETH.address,
+        makerAssetAddr: token.DAI.address,
+        takerAssetAmount: 1,
+        makerAssetAmount: 1000,
+        salt: signingHelper.generateRandomSalt(),
+        deadline: EXPIRY,
+        feeFactor: 0,
+    }
 
-        before(async () => {
-            await dealETH(maker, ethers.utils.parseEther("100"))
-        })
-
-        it("Should sign and encode valid order", async () => {
-            const order = {
-                ...defaultOrder,
-            }
-
-            await dealTokenAndApprove(
-                maker,
-                tokenlon.AllowanceTarget,
-                order.makerAssetAddr,
-                order.makerAssetAmount,
-            )
-
-            // maker
-            const makerSignature = await signingHelper.signRFQOrder(order, {
-                type: SignatureType.EIP712,
-                signer: maker,
-                verifyingContract: tokenlon.RFQ.address,
-            })
-
-            // taker
-            const fill: RFQFill = {
-                ...order,
-                receiverAddr: wallet.user.address,
-            }
-            const takerSignature = await signingHelper.signRFQFillOrder(fill, {
-                type: SignatureType.EIP712,
-                signer: wallet.user,
-                verifyingContract: tokenlon.RFQ.address,
-            })
-
-            const payload = encodingHelper.encodeRFQFill({
-                ...fill,
-                makerSignature,
-                takerSignature,
-            })
-            const tx = await tokenlon.UserProxy.connect(wallet.user).toRFQ(payload, {
-                value: order.takerAssetAmount,
-            })
-            const receipt = await tx.wait()
-
-            assertFilled(receipt, fill)
-        })
-
-        it("Should sign and encode valid order for ERC1271 wallet", async () => {
-            const makerERC1271Wallet = await deployERC1271Wallet(maker)
-
-            const order = {
-                ...defaultOrder,
-                makerAddr: makerERC1271Wallet.address,
-            }
-
-            await dealTokenAndApprove(
-                maker,
-                tokenlon.AllowanceTarget,
-                order.makerAssetAddr,
-                order.makerAssetAmount,
-                {
-                    walletContract: makerERC1271Wallet,
-                },
-            )
-
-            // maker
-            const makerSignature = await signingHelper.signRFQOrder(order, {
-                type: SignatureType.WalletBytes32,
-                signer: maker,
-                verifyingContract: tokenlon.RFQ.address,
-            })
-
-            // taker
-            const fill: RFQFill = {
-                ...order,
-                receiverAddr: wallet.user.address,
-            }
-            const takerSignature = await signingHelper.signRFQFillOrder(fill, {
-                type: SignatureType.EIP712,
-                signer: wallet.user,
-                verifyingContract: tokenlon.RFQ.address,
-            })
-
-            const payload = encodingHelper.encodeRFQFill({
-                ...fill,
-                makerSignature,
-                takerSignature,
-            })
-            const tx = await tokenlon.UserProxy.connect(wallet.user).toRFQ(payload, {
-                value: order.takerAssetAmount,
-            })
-            const receipt = await tx.wait()
-
-            assertFilled(receipt, fill)
-        })
-
-        it("Should sign and encode valid order for ERC1271 wallet by ETHSign", async () => {
-            const makerERC1271Wallet = await deployERC1271WalletETHSign(maker)
-
-            const order = {
-                ...defaultOrder,
-                makerAddr: makerERC1271Wallet.address,
-            }
-
-            await dealTokenAndApprove(
-                maker,
-                tokenlon.AllowanceTarget,
-                order.makerAssetAddr,
-                order.makerAssetAmount,
-                {
-                    walletContract: makerERC1271Wallet,
-                },
-            )
-
-            // maker
-            const makerOrderDigest = await signingHelper.getRFQOrderEIP712Digest(order, {
-                chainId: network.chainId,
-                verifyingContract: tokenlon.RFQ.address,
-            })
-            const makerSignature = signingHelper.composeSignature(
-                await maker.signMessage(ethers.utils.arrayify(makerOrderDigest)),
-                SignatureType.WalletBytes32,
-            )
-
-            // taker
-            const fill: RFQFill = {
-                ...order,
-                receiverAddr: wallet.user.address,
-            }
-            const takerSignature = await signingHelper.signRFQFillOrder(fill, {
-                type: SignatureType.EIP712,
-                signer: wallet.user,
-                verifyingContract: tokenlon.RFQ.address,
-            })
-
-            const payload = encodingHelper.encodeRFQFill({
-                ...fill,
-                makerSignature,
-                takerSignature,
-            })
-            const tx = await tokenlon.UserProxy.connect(wallet.user).toRFQ(payload, {
-                value: order.takerAssetAmount,
-            })
-            const receipt = await tx.wait()
-
-            assertFilled(receipt, fill)
-        })
-
-        async function assertFilled(receipt: ContractReceipt, fill: RFQFill) {
-            const [{ args }] = parseLogsByName(tokenlon.RFQ, "FillOrder", receipt.logs)
-
-            // Verify order
-            expect(args.source).to.equal("RFQ v1")
-            expect(args.orderHash).to.equal(signingHelper.getRFQOrderEIP712StructHash(fill))
-            expect(args.transactionHash).to.equal(signingHelper.getRFQFillEIP712StructHash(fill))
-            expect(args.makerAddr).to.equal(fill.makerAddr)
-            expect(args.takerAssetAddr).to.equal(fill.takerAssetAddr)
-            expect(args.makerAssetAddr).to.equal(fill.makerAssetAddr)
-            expect(args.takerAssetAmount).to.equal(fill.takerAssetAmount)
-            expect(args.makerAssetAmount).to.equal(fill.makerAssetAmount)
-            expect(args.userAddr).to.equal(fill.takerAddr)
-            expect(args.receiverAddr).to.equal(fill.receiverAddr)
-            expect(args.feeFactor).to.equal(fill.feeFactor)
-        }
+    before(async () => {
+        await dealETH(maker, ethers.utils.parseEther("100"))
     })
-}
+
+    it("Should sign and encode valid order", async () => {
+        const order = {
+            ...defaultOrder,
+        }
+
+        await dealTokenAndApprove(
+            maker,
+            tokenlon.AllowanceTarget,
+            order.makerAssetAddr,
+            order.makerAssetAmount,
+        )
+
+        // maker
+        const makerSignature = await signingHelper.signRFQOrder(order, {
+            type: SignatureType.EIP712,
+            signer: maker,
+            verifyingContract: tokenlon.RFQ.address,
+        })
+
+        // taker
+        const fill: RFQFill = {
+            ...order,
+            receiverAddr: wallet.user.address,
+        }
+        const takerSignature = await signingHelper.signRFQFillOrder(fill, {
+            type: SignatureType.EIP712,
+            signer: wallet.user,
+            verifyingContract: tokenlon.RFQ.address,
+        })
+
+        const payload = encodingHelper.encodeRFQFill({
+            ...fill,
+            makerSignature,
+            takerSignature,
+        })
+        const tx = await tokenlon.UserProxy.connect(wallet.user).toRFQ(payload, {
+            value: order.takerAssetAmount,
+        })
+        const receipt = await tx.wait()
+
+        assertFilled(receipt, fill)
+    })
+
+    it("Should sign and encode valid order for ERC1271 wallet", async () => {
+        const makerERC1271Wallet = await deployERC1271Wallet(maker)
+
+        const order = {
+            ...defaultOrder,
+            makerAddr: makerERC1271Wallet.address,
+        }
+
+        await dealTokenAndApprove(
+            maker,
+            tokenlon.AllowanceTarget,
+            order.makerAssetAddr,
+            order.makerAssetAmount,
+            {
+                walletContract: makerERC1271Wallet,
+            },
+        )
+
+        // maker
+        const makerSignature = await signingHelper.signRFQOrder(order, {
+            type: SignatureType.WalletBytes32,
+            signer: maker,
+            verifyingContract: tokenlon.RFQ.address,
+        })
+
+        // taker
+        const fill: RFQFill = {
+            ...order,
+            receiverAddr: wallet.user.address,
+        }
+        const takerSignature = await signingHelper.signRFQFillOrder(fill, {
+            type: SignatureType.EIP712,
+            signer: wallet.user,
+            verifyingContract: tokenlon.RFQ.address,
+        })
+
+        const payload = encodingHelper.encodeRFQFill({
+            ...fill,
+            makerSignature,
+            takerSignature,
+        })
+        const tx = await tokenlon.UserProxy.connect(wallet.user).toRFQ(payload, {
+            value: order.takerAssetAmount,
+        })
+        const receipt = await tx.wait()
+
+        assertFilled(receipt, fill)
+    })
+
+    it("Should sign and encode valid order for ERC1271 wallet by ETHSign", async () => {
+        const makerERC1271Wallet = await deployERC1271WalletETHSign(maker)
+
+        const order = {
+            ...defaultOrder,
+            makerAddr: makerERC1271Wallet.address,
+        }
+
+        await dealTokenAndApprove(
+            maker,
+            tokenlon.AllowanceTarget,
+            order.makerAssetAddr,
+            order.makerAssetAmount,
+            {
+                walletContract: makerERC1271Wallet,
+            },
+        )
+
+        // maker
+        const makerOrderDigest = await signingHelper.getRFQOrderEIP712Digest(order, {
+            chainId: network.chainId,
+            verifyingContract: tokenlon.RFQ.address,
+        })
+        const makerSignature = signingHelper.composeSignature(
+            await maker.signMessage(ethers.utils.arrayify(makerOrderDigest)),
+            SignatureType.WalletBytes32,
+        )
+
+        // taker
+        const fill: RFQFill = {
+            ...order,
+            receiverAddr: wallet.user.address,
+        }
+        const takerSignature = await signingHelper.signRFQFillOrder(fill, {
+            type: SignatureType.EIP712,
+            signer: wallet.user,
+            verifyingContract: tokenlon.RFQ.address,
+        })
+
+        const payload = encodingHelper.encodeRFQFill({
+            ...fill,
+            makerSignature,
+            takerSignature,
+        })
+        const tx = await tokenlon.UserProxy.connect(wallet.user).toRFQ(payload, {
+            value: order.takerAssetAmount,
+        })
+        const receipt = await tx.wait()
+
+        assertFilled(receipt, fill)
+    })
+
+    async function assertFilled(receipt: ContractReceipt, fill: RFQFill) {
+        const [{ args }] = parseLogsByName(tokenlon.RFQ, "FillOrder", receipt.logs)
+
+        // Verify order
+        expect(args.source).to.equal("RFQ v1")
+        expect(args.orderHash).to.equal(signingHelper.getRFQOrderEIP712StructHash(fill))
+        expect(args.transactionHash).to.equal(signingHelper.getRFQFillEIP712StructHash(fill))
+        expect(args.makerAddr).to.equal(fill.makerAddr)
+        expect(args.takerAssetAddr).to.equal(fill.takerAssetAddr)
+        expect(args.makerAssetAddr).to.equal(fill.makerAssetAddr)
+        expect(args.takerAssetAmount).to.equal(fill.takerAssetAmount)
+        expect(args.makerAssetAmount).to.equal(fill.makerAssetAmount)
+        expect(args.userAddr).to.equal(fill.takerAddr)
+        expect(args.receiverAddr).to.equal(fill.receiverAddr)
+        expect(args.feeFactor).to.equal(fill.feeFactor)
+    }
+})
