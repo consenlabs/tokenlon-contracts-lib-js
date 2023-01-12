@@ -1,7 +1,19 @@
 export enum Network {
     Mainnet = 1,
     Goerli = 5,
+    Optimism = 10,
+    OptimismGoerli = 420,
     Arbitrum = 42161,
+    ArbitrumGoerli = 421613,
+}
+
+enum NetworkFilePath {
+    EthereumMainnet = Network.Mainnet,
+    EthereumGoerli = Network.Goerli,
+    OptimismMainnet = Network.Optimism,
+    OptimismGoerli = Network.OptimismGoerli,
+    ArbitrumMainnet = Network.Arbitrum,
+    ArbitrumGoerli = Network.ArbitrumGoerli,
 }
 
 const network = (() => {
@@ -44,4 +56,6 @@ export type Addresses = {
     Curve3Pool: string
 }
 
-export const addresses = require(`./${Network[network].toLowerCase()}.ts`).default as Addresses
+export const addresses = require(`.${NetworkFilePath[network]
+    .replace(/([A-Z])/g, "/$1")
+    .toLowerCase()}.ts`).default as Addresses

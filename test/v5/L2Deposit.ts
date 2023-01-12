@@ -1,8 +1,8 @@
 import { expect } from "chai"
 import { BigNumber, ContractReceipt } from "ethers"
 import { ethers } from "hardhat"
-import arbitrumGoerliNetwork from "@network/arbitrumGoerli"
-import optimismGoerliNetwork from "@network/optimismGoerli"
+import arbitrumGoerliNetwork from "@network/arbitrum/goerli"
+import optimismGoerliNetwork from "@network/optimism/goerli"
 import { Network, isNetwork } from "@network"
 import {
     L2Deposit,
@@ -51,9 +51,10 @@ if (isNetwork(Network.Goerli)) {
             l2Gas: ethers.utils.parseUnits("1", "mwei"),
         }
         // Declare variables for the deposit data of L1 token and L2 token mapped from L1
-        const l1Token = token.USDT.address
-        const l2ArbitrumToken = arbitrumGoerliNetwork.USDT
-        const l2OptimismToken = optimismGoerliNetwork.USDT
+        const targetToken = "USDT"
+        const l1Token = token[targetToken].address
+        const l2ArbitrumToken = arbitrumGoerliNetwork[targetToken]
+        const l2OptimismToken = optimismGoerliNetwork[targetToken]
 
         /* Test for the Arbitrum bridge  */
 
