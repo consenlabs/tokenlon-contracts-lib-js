@@ -14,6 +14,13 @@ import {
     L2OptimismDepositData,
 } from "./types"
 
+export const abiAMMUniswapV3SingleHopData = ["uint8", "uint24"]
+export const abiAMMUniswapV3MultiHopsData = ["uint8", "bytes"]
+export const abiAMMCurveData = ["uint8"]
+export const abiL2ArbitrumDepositData = ["address", "uint256", "uint256", "uint256"]
+export const abiL2OptimismDepositData = ["uint32"]
+export const abiUniswapV2Path = ["address[]"]
+
 export class EncodingHelper {
     /* AMM */
 
@@ -57,20 +64,20 @@ export class EncodingHelper {
 
     public encodeAMMUniswapV3SingleHopData(fee: number): string {
         const swapType = 1
-        const coder = ethers.utils.defaultAbiCoder
-        return coder.encode(["uint8", "uint24"], [swapType, fee])
+        return ethers.utils.defaultAbiCoder.encode(abiAMMUniswapV3SingleHopData, [swapType, fee])
     }
 
     public encodeAMMUniswapV3MultiHopsData(path: string[], fees: number[]): string {
         const swapType = 2
         const uniswapV3Path = encodeUniswapV3Path(path, fees)
-        const coder = ethers.utils.defaultAbiCoder
-        return coder.encode(["uint8", "bytes"], [swapType, uniswapV3Path])
+        return ethers.utils.defaultAbiCoder.encode(abiAMMUniswapV3MultiHopsData, [
+            swapType,
+            uniswapV3Path,
+        ])
     }
 
     public encodeAMMCurveData(version: number): string {
-        const coder = ethers.utils.defaultAbiCoder
-        return coder.encode(["uint8"], [version])
+        return ethers.utils.defaultAbiCoder.encode(abiAMMCurveData, [version])
     }
 
     /* Limit Order */
@@ -192,21 +199,20 @@ export class EncodingHelper {
     /* Vendor */
 
     public encodeL2ArbitrumDepositData(user: string, data: L2ArbitrumDepositData): string {
-        const coder = ethers.utils.defaultAbiCoder
-        return coder.encode(
-            ["address", "uint256", "uint256", "uint256"],
-            [user, data.maxSubmissionCost, data.maxGas, data.gasPriceBid],
-        )
+        return ethers.utils.defaultAbiCoder.encode(abiL2ArbitrumDepositData, [
+            user,
+            data.maxSubmissionCost,
+            data.maxGas,
+            data.gasPriceBid,
+        ])
     }
 
     public encodeL2OptimismDepositData(data: L2OptimismDepositData): string {
-        const coder = ethers.utils.defaultAbiCoder
-        return coder.encode(["uint32"], [data.l2Gas])
+        return ethers.utils.defaultAbiCoder.encode(abiL2OptimismDepositData, [data.l2Gas])
     }
 
     public encodeUniswapV2Path(path: string[]) {
-        const coder = ethers.utils.defaultAbiCoder
-        return coder.encode(["address[]"], [path])
+        return ethers.utils.defaultAbiCoder.encode(abiUniswapV2Path, [path])
     }
 
     public encodeUniswapV3Path(path: string[], fees: number[]) {
