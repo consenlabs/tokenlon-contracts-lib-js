@@ -28,12 +28,6 @@ export type Context = {
         USDC: IERC20
         USDT: IERC20
         WETH: IERC20
-        DAIForArbitrumBridge: IERC20
-        USDCForArbitrumBridge: IERC20
-        USDTForArbitrumBridge: IERC20
-        DAIForOptimismBridge: IERC20
-        USDCForOptimismBridge: IERC20
-        USDTForOptimismBridge: IERC20
     }
     tokenlon: {
         AllowanceTarget: IAllowanceTarget
@@ -71,30 +65,6 @@ async function setupContext(): Promise<Context> {
             USDC: await ethers.getContractAt("IERC20", addresses.USDC),
             USDT: await ethers.getContractAt("IERC20", addresses.USDT),
             WETH: await ethers.getContractAt("IERC20", addresses.WETH),
-            DAIForArbitrumBridge: await ethers.getContractAt(
-                "IERC20",
-                addresses.DAIForArbitrumBridge,
-            ),
-            USDCForArbitrumBridge: await ethers.getContractAt(
-                "IERC20",
-                addresses.USDCForArbitrumBridge,
-            ),
-            USDTForArbitrumBridge: await ethers.getContractAt(
-                "IERC20",
-                addresses.USDTForArbitrumBridge,
-            ),
-            DAIForOptimismBridge: await ethers.getContractAt(
-                "IERC20",
-                addresses.DAIForOptimismBridge,
-            ),
-            USDCForOptimismBridge: await ethers.getContractAt(
-                "IERC20",
-                addresses.USDCForOptimismBridge,
-            ),
-            USDTForOptimismBridge: await ethers.getContractAt(
-                "IERC20",
-                addresses.USDTForOptimismBridge,
-            ),
         },
         tokenlon: {
             AllowanceTarget: await ethers.getContractAt(

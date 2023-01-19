@@ -5,6 +5,7 @@
     "paths": {
       "@src/*": ["./src/*"],
       "@network": ["./network"],
+      "@network/*": ["./network/*"],
       "@test/*": ["./test/*"],
       "@typechain": ["./typechain-types"]
     }

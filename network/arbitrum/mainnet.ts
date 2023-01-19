@@ -24,16 +24,4 @@ export default {
 
     // Curve
     Curve3Pool: "",
-
-    // L2 Bridge
-    ArbitrumL1GatewayRouter: "",
-    OptimismL1StandardBridge: "",
-
-    // L2 Token
-    DAIForArbitrumBridge: "",
-    USDCForArbitrumBridge: "",
-    USDTForArbitrumBridge: "",
-    DAIForOptimismBridge: "",
-    USDCForOptimismBridge: "",
-    USDTForOptimismBridge: "",
 }

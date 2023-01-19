@@ -15,7 +15,7 @@ import {
 } from "@test/utils/contract"
 
 contextSuite("RFQ", ({ wallet, network, token, tokenlon }) => {
-    if (!isNetwork(Network.Mainnet)) {
+    if (!isNetwork(Network.EthereumMainnet)) {
         return
     }
     const maker = Wallet.createRandom().connect(ethers.provider)

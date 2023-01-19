@@ -30,7 +30,7 @@ import {
 import { ERC1271Wallet } from "@typechain"
 
 contextSuite("LimitOrder", ({ wallet, network, token, tokenlon, uniswap, sushiswap }) => {
-    if (!isNetwork(Network.Arbitrum)) {
+    if (!isNetwork(Network.ArbitrumMainnet)) {
         return
     }
     const coordinator = Wallet.createRandom().connect(ethers.provider)

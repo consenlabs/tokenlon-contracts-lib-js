@@ -1,6 +1,8 @@
 import { expect } from "chai"
 import { BigNumber, ContractReceipt } from "ethers"
 import { ethers } from "hardhat"
+import arbitrumGoerliNetwork from "@network/arbitrum/goerli"
+import optimismGoerliNetwork from "@network/optimism/goerli"
 import { Network, isNetwork } from "@network"
 import {
     L2Deposit,
@@ -25,7 +27,7 @@ enum L2Identifier {
 }
 
 contextSuite("L2Deposit", ({ wallet, network, token, tokenlon }) => {
-    if (!isNetwork(Network.Goerli)) {
+    if (!isNetwork(Network.EthereumGoerli)) {
         return
     }
     // Configure the default deposit information
@@ -50,6 +52,11 @@ contextSuite("L2Deposit", ({ wallet, network, token, tokenlon }) => {
     const optimismGasData: L2OptimismDepositData = {
         l2Gas: ethers.utils.parseUnits("1", "mwei"),
     }
+    // Declare variables for the deposit data of L1 token and L2 token mapped from L1
+    const targetToken = "USDT"
+    const l1Token = token[targetToken].address
+    const l2ArbitrumToken = arbitrumGoerliNetwork[targetToken]
+    const l2OptimismToken = optimismGoerliNetwork[targetToken]
 
     /* Test for the Arbitrum bridge  */
 
@@ -60,8 +67,8 @@ contextSuite("L2Deposit", ({ wallet, network, token, tokenlon }) => {
                 // Override the default deposit data for the Arbitrum bridge
                 ...defaultDeposit,
                 l2Identifier: L2Identifier.Arbitrum,
-                l1TokenAddr: token.USDT.address,
-                l2TokenAddr: token.USDTForArbitrumBridge.address,
+                l1TokenAddr: l1Token,
+                l2TokenAddr: l2ArbitrumToken,
                 data: encodingHelper.encodeL2ArbitrumDepositData(
                     wallet.user.address,
                     arbitrumGasData,
@@ -102,9 +109,9 @@ contextSuite("L2Deposit", ({ wallet, network, token, tokenlon }) => {
             const deposit = {
                 // Override the default deposit data for the Arbitrum bridge
                 ...defaultDeposit,
-                l1TokenAddr: token.USDT.address,
                 l2Identifier: L2Identifier.Arbitrum,
-                l2TokenAddr: token.USDTForArbitrumBridge.address,
+                l1TokenAddr: l1Token,
+                l2TokenAddr: l2ArbitrumToken,
                 sender: erc1271Wallet.address,
                 recipient: erc1271Wallet.address,
                 data: encodingHelper.encodeL2ArbitrumDepositData(
@@ -150,9 +157,9 @@ contextSuite("L2Deposit", ({ wallet, network, token, tokenlon }) => {
             const deposit = {
                 // Override the default deposit data for the Arbitrum bridge
                 ...defaultDeposit,
-                l1TokenAddr: token.USDT.address,
                 l2Identifier: L2Identifier.Arbitrum,
-                l2TokenAddr: token.USDTForArbitrumBridge.address,
+                l1TokenAddr: l1Token,
+                l2TokenAddr: l2ArbitrumToken,
                 sender: erc1271Wallet.address,
                 recipient: erc1271Wallet.address,
                 data: encodingHelper.encodeL2ArbitrumDepositData(
@@ -207,8 +214,8 @@ contextSuite("L2Deposit", ({ wallet, network, token, tokenlon }) => {
                 // Override the default deposit data for the Optimism bridge
                 ...defaultDeposit,
                 l2Identifier: L2Identifier.Optimism,
-                l1TokenAddr: token.USDT.address,
-                l2TokenAddr: token.USDTForOptimismBridge.address, // It does not matter for Optimism bridge
+                l1TokenAddr: l1Token,
+                l2TokenAddr: l2OptimismToken, // It does not matter for Optimism bridge
                 data: encodingHelper.encodeL2OptimismDepositData(optimismGasData),
             }
             // Obtain a specific amount of tokens and approve their to be used by the AllowanceTarget contract
@@ -244,9 +251,9 @@ contextSuite("L2Deposit", ({ wallet, network, token, tokenlon }) => {
             const deposit = {
                 // Override the default deposit data for the Optimism bridge
                 ...defaultDeposit,
-                l1TokenAddr: token.USDT.address,
                 l2Identifier: L2Identifier.Optimism,
-                l2TokenAddr: token.USDTForOptimismBridge.address, // It does not matter for Optimism bridge
+                l1TokenAddr: l1Token,
+                l2TokenAddr: l2OptimismToken, // It does not matter for Optimism bridge
                 sender: erc1271Wallet.address,
                 recipient: erc1271Wallet.address,
                 data: encodingHelper.encodeL2OptimismDepositData(optimismGasData),
@@ -288,9 +295,9 @@ contextSuite("L2Deposit", ({ wallet, network, token, tokenlon }) => {
             const deposit = {
                 // Override the default deposit data for the Optimism bridge
                 ...defaultDeposit,
-                l1TokenAddr: token.USDT.address,
                 l2Identifier: L2Identifier.Optimism,
-                l2TokenAddr: token.USDTForOptimismBridge.address, // It does not matter for Optimism bridge
+                l1TokenAddr: l1Token,
+                l2TokenAddr: l2OptimismToken, // It does not matter for Optimism bridge
                 sender: erc1271Wallet.address,
                 recipient: erc1271Wallet.address,
                 data: encodingHelper.encodeL2OptimismDepositData(optimismGasData),

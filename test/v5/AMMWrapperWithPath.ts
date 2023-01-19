@@ -16,7 +16,7 @@ import {
 } from "@test/utils/contract"
 
 contextSuite("AMMWrapperWithPath", ({ wallet, network, token, tokenlon, uniswap }) => {
-    if (!isNetwork(Network.Mainnet)) {
+    if (!isNetwork(Network.EthereumMainnet)) {
         return
     }
     const defaultOrder: AMMOrder = {

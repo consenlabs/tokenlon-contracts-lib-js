@@ -1,7 +1,10 @@
 export enum Network {
-    Mainnet = 1,
-    Goerli = 5,
-    Arbitrum = 42161,
+    EthereumMainnet = 1,
+    EthereumGoerli = 5,
+    OptimismMainnet = 10,
+    OptimismGoerli = 420,
+    ArbitrumMainnet = 42161,
+    ArbitrumGoerli = 421613,
 }
 
 const network = (() => {
@@ -42,18 +45,7 @@ export type Addresses = {
 
     // Curve
     Curve3Pool: string
-
-    // L2 Bridge
-    ArbitrumL1GatewayRouter: string
-    OptimismL1StandardBridge: string
-
-    // L2 Token
-    DAIForArbitrumBridge: string
-    USDCForArbitrumBridge: string
-    USDTForArbitrumBridge: string
-    DAIForOptimismBridge: string
-    USDCForOptimismBridge: string
-    USDTForOptimismBridge: string
 }
 
-export const addresses = require(`./${Network[network].toLowerCase()}.ts`).default as Addresses
+export const addresses = require(`.${Network[network].replace(/([A-Z])/g, "/$1").toLowerCase()}.ts`)
+    .default as Addresses
