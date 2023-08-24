@@ -1,5 +1,5 @@
 import crypto from "crypto"
-import { BigNumber } from "ethers"
+import { BigNumber, utils } from "ethers"
 import { _TypedDataEncoder } from "@ethersproject/hash"
 
 import {
@@ -23,6 +23,13 @@ export class SigningHelper {
     public constructor(options: SigningHelperOptions) {
         this.name = options.name
         this.version = options.version
+    }
+
+    public generateRandomBytesHex(bytesLength: number): string {
+        if (bytesLength == 20) {
+            return utils.getAddress("0x" + crypto.randomBytes(bytesLength).toString("hex"))
+        }
+        return "0x" + crypto.randomBytes(bytesLength).toString("hex")
     }
 
     public generateRandomSalt(): BigNumber {
@@ -55,14 +62,18 @@ export class SigningHelper {
         types: EIP712Types,
         value: EIP712Value,
         options: SigningOptions,
+        signForV6?: boolean,
     ): Promise<string> {
         const domain = await this.getEIP712Domain({
             chainId: await options.signer.getChainId(),
             verifyingContract: options.verifyingContract,
         })
         const signature = await options.signer._signTypedData(domain, types, value)
-        const signatureComposed = this.composeSignature(signature, options.type)
-        return signatureComposed
+        if (signForV6 ?? false) {
+            return signature
+        } else {
+            return this.composeSignature(signature, options.type)
+        }
     }
 
     public composeSignature(signature: string, type: SignatureType) {
