@@ -3,7 +3,7 @@ import { SigningHelper } from "@src/v6/signing"
 import { SignatureType, EIP712Signer } from "@src/signing"
 import { AllowFill, GenericSwapData, LimitOrder, RFQOffer, RFQTx } from "@src/v6/types"
 
-describe("Generate EIP-712 signatures", async () => {
+describe("Generate V6 EIP712 signature examples", async () => {
     const signingHelper = new SigningHelper()
 
     let provider: providers.JsonRpcProvider
