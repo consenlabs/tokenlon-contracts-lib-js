@@ -1,5 +1,4 @@
-import { _TypedDataEncoder } from "ethers/lib/utils"
-import { keccak_256 } from "@noble/hashes/sha3"
+import { _TypedDataEncoder, keccak256 } from "ethers/lib/utils"
 import { hexToBytes, utf8ToBytes } from "@noble/hashes/utils"
 import { AllowFill, GenericSwapData, LimitOrder, RFQOffer, RFQTx } from "./types"
 
@@ -26,13 +25,6 @@ export class SigningHelper extends BaseSigningHelper {
             return hexToBytes(data)
         }
         return utf8ToBytes(data)
-    }
-
-    private keccak256 = (data: string | Uint8Array, encoding?: "utf8" | "hex"): String => {
-        if (typeof data === "string" && encoding === "utf8") {
-            return "0x" + Buffer.from(keccak_256(this.toBuffer(data, encoding))).toString("hex")
-        }
-        return "0x" + Buffer.from(keccak_256(data)).toString("hex")
     }
 
     /* AllowFill */
@@ -62,10 +54,10 @@ export class SigningHelper extends BaseSigningHelper {
     }
 
     public getAllowFillEIP712Typehash(): String {
-        return this.keccak256(
-            _TypedDataEncoder.from(this.getAllowFillEIP712Types()).encodeType("AllowFill"),
-            "utf8",
-        )
+        const typeString = _TypedDataEncoder
+            .from(this.getAllowFillEIP712Types())
+            .encodeType("AllowFill")
+        return keccak256(this.toBuffer(typeString, "utf8"))
     }
 
     public signAllowFill(allowFill: AllowFill, options: SigningOptions): Promise<string> {
@@ -108,12 +100,10 @@ export class SigningHelper extends BaseSigningHelper {
     }
 
     public getGenericSwapDataEIP712Typehash(): String {
-        return this.keccak256(
-            _TypedDataEncoder
-                .from(this.getGenericSwapDataEIP712Types())
-                .encodeType("GenericSwapData"),
-            "utf8",
-        )
+        const typeString = _TypedDataEncoder
+            .from(this.getGenericSwapDataEIP712Types())
+            .encodeType("GenericSwapData")
+        return keccak256(this.toBuffer(typeString, "utf8"))
     }
 
     public signGenericSwapData(
@@ -155,10 +145,10 @@ export class SigningHelper extends BaseSigningHelper {
     }
 
     public getLimitOrderEIP712Typehash(): String {
-        return this.keccak256(
-            _TypedDataEncoder.from(this.getLimitOrderEIP712Types()).encodeType("LimitOrder"),
-            "utf8",
-        )
+        const typeString = _TypedDataEncoder
+            .from(this.getLimitOrderEIP712Types())
+            .encodeType("LimitOrder")
+        return keccak256(this.toBuffer(typeString, "utf8"))
     }
 
     public signLimitOrder(limitOrder: LimitOrder, options: SigningOptions): Promise<string> {
@@ -197,10 +187,10 @@ export class SigningHelper extends BaseSigningHelper {
     }
 
     public getRFQOfferEIP712Typehash(): String {
-        return this.keccak256(
-            _TypedDataEncoder.from(this.getRFQOfferEIP712Types()).encodeType("RFQOffer"),
-            "utf8",
-        )
+        const typeString = _TypedDataEncoder
+            .from(this.getRFQOfferEIP712Types())
+            .encodeType("RFQOffer")
+        return keccak256(this.toBuffer(typeString, "utf8"))
     }
 
     public signRFQOffer(rfqOffer: RFQOffer, options: SigningOptions): Promise<string> {
@@ -241,10 +231,8 @@ export class SigningHelper extends BaseSigningHelper {
     }
 
     public getRFQTxEIP712Typehash(): String {
-        return this.keccak256(
-            _TypedDataEncoder.from(this.getRFQTxEIP712Types()).encodeType("RFQTx"),
-            "utf8",
-        )
+        const typeString = _TypedDataEncoder.from(this.getRFQTxEIP712Types()).encodeType("RFQTx")
+        return keccak256(this.toBuffer(typeString, "utf8"))
     }
 
     public signRFQTx(rfqTx: RFQTx, options: SigningOptions): Promise<string> {
