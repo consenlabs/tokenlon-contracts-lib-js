@@ -7,5 +7,5 @@ on:
 
 jobs:
   build:
-    uses: consenlabs/tokenlon-contracts-lib-js/.github/workflows/build.yaml@5928d32dd6cafde205034229c0369081d369001f
+    uses: consenlabs/tokenlon-contracts-lib-js/.github/workflows/build.yaml@570a419a43822625690ec9dd6353272f802f625d
     secrets: inherit
