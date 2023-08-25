@@ -18,7 +18,7 @@ export class SigningHelper extends BaseSigningHelper {
         })
     }
 
-    private toBuffer = (data: string, encoding: "utf8" | "hex" = "hex"): Uint8Array => {
+    private toBuffer(data: string, encoding: "utf8" | "hex" = "hex"): Uint8Array {
         if (encoding === "hex") {
             if (data.startsWith("0x")) {
                 return hexToBytes(data.substring(2))
