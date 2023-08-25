@@ -69,7 +69,7 @@ export class SigningHelper extends BaseSigningHelper {
     }
 
     public signAllowFill(allowFill: AllowFill, options: SigningOptions): Promise<string> {
-        return this.signEIP712(this.getAllowFillEIP712Types(), allowFill, options, true)
+        return this.signEIP712(this.getAllowFillEIP712Types(), allowFill, options)
     }
 
     /* GenericSwapData */
@@ -120,7 +120,7 @@ export class SigningHelper extends BaseSigningHelper {
         genericSwapData: GenericSwapData,
         options: SigningOptions,
     ): Promise<string> {
-        return this.signEIP712(this.getGenericSwapDataEIP712Types(), genericSwapData, options, true)
+        return this.signEIP712(this.getGenericSwapDataEIP712Types(), genericSwapData, options)
     }
 
     /* LimitOrder */
@@ -162,7 +162,7 @@ export class SigningHelper extends BaseSigningHelper {
     }
 
     public signLimitOrder(limitOrder: LimitOrder, options: SigningOptions): Promise<string> {
-        return this.signEIP712(this.getLimitOrderEIP712Types(), limitOrder, options, true)
+        return this.signEIP712(this.getLimitOrderEIP712Types(), limitOrder, options)
     }
 
     /* RFQOffer */
@@ -204,7 +204,7 @@ export class SigningHelper extends BaseSigningHelper {
     }
 
     public signRFQOffer(rfqOffer: RFQOffer, options: SigningOptions): Promise<string> {
-        return this.signEIP712(this.getRFQOfferEIP712Types(), rfqOffer, options, true)
+        return this.signEIP712(this.getRFQOfferEIP712Types(), rfqOffer, options)
     }
 
     /* RFQTx */
@@ -248,6 +248,6 @@ export class SigningHelper extends BaseSigningHelper {
     }
 
     public signRFQTx(rfqTx: RFQTx, options: SigningOptions): Promise<string> {
-        return this.signEIP712(this.getRFQTxEIP712Types(), rfqTx, options, true)
+        return this.signEIP712(this.getRFQTxEIP712Types(), rfqTx, options)
     }
 }
