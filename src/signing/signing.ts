@@ -62,17 +62,16 @@ export class SigningHelper {
         types: EIP712Types,
         value: EIP712Value,
         options: SigningOptions,
-        signForV6?: boolean,
     ): Promise<string> {
         const domain = await this.getEIP712Domain({
             chainId: await options.signer.getChainId(),
             verifyingContract: options.verifyingContract,
         })
         const signature = await options.signer._signTypedData(domain, types, value)
-        if (signForV6 ?? false) {
-            return signature
-        } else {
+        if (options.legacy ?? true) {
             return this.composeSignature(signature, options.type)
+        } else {
+            return signature
         }
     }
 
