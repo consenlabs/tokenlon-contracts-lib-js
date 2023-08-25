@@ -10,6 +10,6 @@
       "@typechain": ["./typechain-types"]
     }
   },
-  "include": ["src", "test", "typechain-types"],
+  "include": ["scripts", "src", "test", "typechain-types"],
   "files": ["hardhat.config.ts"]
 }
